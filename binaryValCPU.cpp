@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      binary_val
+ Function      binaryValCPU
 
- Usage         binary_val(x, nx, X)
+ Usage         binaryValCPU(x, nx, X)
 
  Arguments     x:  reference to constant REAL representing the value to
 	           search for in X.
@@ -26,10 +26,10 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include "auxfuncs.h"
 
-int binary_val(const REAL& x, const int& nx, const REAL* X)
+int binaryValCPU(const REAL& x, const int& nx, const REAL* X)
 {
   // storage for integer return value
   int imax;

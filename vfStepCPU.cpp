@@ -1,10 +1,10 @@
 /*============================================================================
 
- Function      vfStep
+ Function      vfStepCPU
 
- Usage         vfStep(klo, khi, nksub, kslo, kshi, ksmid1, ksmid2, w, wmax,
-                      windmax, w1, w2, w3, i, j, l, ydepK, howard, K, Z, P,
-		      Exp, V0, V, G)
+ Usage         vfStepCPU(klo, khi, nksub, kslo, kshi, ksmid1, ksmid2, w, wmax,
+                         windmax, w1, w2, w3, i, j, l, ydepK, howard, K, Z, P,
+		         Exp, V0, V, G)
 
  Arguments     klo:     reference to integer which represents the index
                         corresponding to the lowest value of the capital grid
@@ -104,11 +104,12 @@
 	       performed by either a grid search or binary search algorithm.
 
  Dependencies  Global variables: eta, beta, alpha, delta, nk, nz,
-                                 maxtype, howard (globalvars.h).
+                                 maxtype, howard (global.h).
 
                Functions:        pow (math.h);
 				 cblas_(s,d)gemm, cblas_(s,d)dot (cblas.h);
-	                         binary_val, grid_max, binary_max (auxfuncs.h).
+	                         binaryValCPU, gridMaxCPU,
+				 binaryMaxCPU (auxfuncs.h).
 
  Return value  void.
 
@@ -122,7 +123,7 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include "auxfuncs.h"
 #include <math.h>
 #include <iostream>
@@ -131,12 +132,12 @@
 
 using namespace std;
 
-void vfStep(int& klo, int& khi, int& nksub, int& kslo, int& kshi, int& ksmid1,
-	    int& ksmid2, REAL& w, REAL& wmax, int& windmax, REAL& w1,
-	    REAL& w2, REAL& w3, int& i, int& j, int& l, REAL& ydepK,
-	    const bool& howard, const REAL* K,const REAL* Z,
-	    const REAL* P, REAL* Exp, const REAL* V0, REAL* V,
-	    REAL* G)
+void vfStepCPU(int& klo, int& khi, int& nksub, int& kslo, int& kshi, int& ksmid1,
+	       int& ksmid2, REAL& w, REAL& wmax, int& windmax, REAL& w1,
+	       REAL& w2, REAL& w3, int& i, int& j, int& l, REAL& ydepK,
+	       const bool& howard, const REAL* K,const REAL* Z,
+	       const REAL* P, REAL* Exp, const REAL* V0, REAL* V,
+	       REAL* G)
 {
   for(i = 0 ; i < nk ; ++i){
     for(j = 0 ; j < nz ; ++j){
@@ -149,7 +150,7 @@ void vfStep(int& klo, int& khi, int& nksub, int& kslo, int& kshi, int& ksmid1,
 
 	// impose constraints on grid for future capital
 	klo = 0;
-	khi = binary_val(ydepK, nk, K); // consumption nonnegativity
+	khi = binaryValCPU(ydepK, nk, K); // consumption nonnegativity
 	if(K[khi] > ydepK) khi -= 1;
 
 	// further restrict capital grid via monotonicity (CPU only)
@@ -171,11 +172,11 @@ void vfStep(int& klo, int& khi, int& nksub, int& kslo, int& kshi, int& ksmid1,
 	// maximization either via grid (g), of binary search (b)
 	// if binary, turn off policy iteration (to preserve concavity)
 	if(maxtype == 'g'){
-	  grid_max(klo, nksub, l, w, wmax, windmax, ydepK, K, Exp, V+i*nz+j,
-		   G+i*nz+j);
+	  gridMaxCPU(klo, nksub, l, w, wmax, windmax, ydepK, K, Exp, V+i*nz+j,
+		     G+i*nz+j);
 	} else if (maxtype == 'b'){
-	  binary_max(klo, nksub, kslo, kshi, ksmid1, ksmid2, w1, w2, w3,
-		     ydepK, K, Exp, V+i*nz+j, G+i*nz+j);
+	  binaryMaxCPU(klo, nksub, kslo, kshi, ksmid1, ksmid2, w1, w2, w3,
+		       ydepK, K, Exp, V+i*nz+j, G+i*nz+j);
 	}
 
       // iterate on the policy function on non-howard steps

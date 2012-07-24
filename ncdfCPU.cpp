@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      ncdf
+ Function      ncdfCPU
 
- Usage         ncdf(q)
+ Usage         ncdfCPU(q)
 
  Arguments     q: constant REAL representing the quantile of the normal
                   density.
@@ -23,11 +23,11 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include "auxfuncs.h"
 #include <math.h>
 
-REAL ncdf(const REAL q)
+REAL ncdfCPU(const REAL q)
 {
   // quadrature nodes
   REAL x1 = 0.9739065285;

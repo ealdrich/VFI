@@ -16,7 +16,8 @@
 
                Functions:        pow, fabs (math.h);
 	                         cblas_(s,d)axpy, cblas_i(s,d)amax (cblas.h);
-	                         ar1, kGrid, vfInit, vfStep (auxfuncs.h).
+	                         ar1CPU, kGridCPU, vfInitCPU,
+				 vfStepCPU (auxfuncs.h).
 
  Return value  Returns 0 upon successful completion, 1 otherwise.
 
@@ -30,12 +31,15 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include "auxfuncs.h"
 #include <math.h>
 #include <ctime>
 #include <typeinfo>
 #include <gsl/gsl_cblas.h>
+#include <iostream>
+
+using namespace std;
 
 int vfiCPU(REAL* V, REAL* G)
 {
@@ -55,9 +59,9 @@ int vfiCPU(REAL* V, REAL* G)
 
   // compute TFP grid, capital grid and initial VF
   REAL lambda = 3;
-  ar1(lambda, Z, P);
-  kGrid(Z, K);
-  vfInit(Z, V0);
+  ar1CPU(lambda, Z, P);
+  kGridCPU(Z, K);
+  vfInitCPU(Z, V0);
 
   // various arguments to vfStep
   REAL* Exp = NULL;
@@ -72,9 +76,8 @@ int vfiCPU(REAL* V, REAL* G)
   int count = 0;
   bool how = false;
   while(fabs(diff) > tol){
-  //while(count < 8){
     if(count < 3 | count % howard == 0) how = false; else how = true;
-    vfStep(klo, khi, nksub, kslo, kshi, ksmid1, ksmid2, w, wmax, windmax, w1,
+    vfStepCPU(klo, khi, nksub, kslo, kshi, ksmid1, ksmid2, w, wmax, windmax, w1,
 	   w2, w3, i, j, l, ydepK, how, K, Z, P, Exp, V0, V, G);
     if(typeid(realtype) == typeid(singletype)){
       cblas_saxpy(nk*nz, -1.0, (float*)V, 1, (float*)V0, 1);

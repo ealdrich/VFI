@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      grid_max
+ Function      gridMaxGPU
 
- Usage         grid_max(klo, nksub, nz, ydepK, eta, beta, K, P, V0, V, G)
+ Usage         gridMaxGPU(klo, nksub, nz, ydepK, eta, beta, K, P, V0, V, G)
 
  Arguments     klo:   constant integer which represents the index
                       corresponding to the lowest value of the capital grid
@@ -53,10 +53,12 @@
 
  ============================================================================*/
 
-__device__ void grid_max(const int klo, const int nksub, const int nz,
-			 const REAL ydepK, const REAL eta,
-			 const REAL beta, const REAL* K, const REAL* P,
-			 const REAL* V0, REAL* V, REAL* G)
+#include "global.h"
+
+__device__ void gridMaxGPU(const int klo, const int nksub, const int nz,
+			   const REAL ydepK, const REAL eta,
+			   const REAL beta, const REAL* K, const REAL* P,
+			   const REAL* V0, REAL* V, REAL* G)
 {
   REAL Exp = 0.0, w, wmax;
   int l, m, windmax;

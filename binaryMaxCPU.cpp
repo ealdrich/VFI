@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      binary_max
+ Function      binaryMaxCPU
 
- Usage         binary_max(klo, kslo, kshi, nksub, ksmid1, ksmid2, w1, w2,
+ Usage         binaryMaxCPU(klo, kslo, kshi, nksub, ksmid1, ksmid2, w1, w2,
                           w3, ydepK, K, Exp, V, G)
 
  Arguments     klo:    reference to constant integer which represents the
@@ -66,7 +66,7 @@
 	       used with the howard improvement method.The max and argmax are
 	       stored in the value and policy functions, respectively.
 
- Dependencies  Global variables: eta, beta (globalvars.h).
+ Dependencies  Global variables: eta, beta (global.h).
 
                Functions:        pow (math.h).
 
@@ -82,15 +82,15 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include "auxfuncs.h"
 #include <math.h>
 
 // binary search maximization function
-void binary_max(const int& klo, const int& nksub, int& kslo, int& kshi,
-		int& ksmid1, int& ksmid2, REAL& w1, REAL& w2, REAL& w3,
-		const REAL& ydepK, const REAL* K, const REAL* Exp,
-		REAL* V, REAL* G)
+void binaryMaxCPU(const int& klo, const int& nksub, int& kslo, int& kshi,
+		  int& ksmid1, int& ksmid2, REAL& w1, REAL& w2, REAL& w3,
+		  const REAL& ydepK, const REAL* K, const REAL* Exp,
+		  REAL* V, REAL* G)
 {
 
   // binary search to find the vf max over K'

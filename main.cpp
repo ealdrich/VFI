@@ -8,10 +8,10 @@
 	       CPU, the GPU or both. The maximization step at each  iteration
 	       of the algorithm is carried out by a grid or binary search
 	       method. The variable 'max' specifies the type of maximation
-	       method to use, and is defined in 'globalvars.cpp'. Economic
-	       variables and grid sizes are also defined in 'globalvars.cpp'.
+	       method to use, and is defined in 'global.cpp'. Economic
+	       variables and grid sizes are also defined in 'global.cpp'.
 
- Dependencies  Global variables: nk, nz (globalvars.h).
+ Dependencies  Global variables: nk, nz (global.h).
 
                Functions:        clock() (ctime.h);
 	                         cblas_(s,d)axpy, cblas_i(s,d)amax (cblas.h);
@@ -29,7 +29,7 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include "auxfuncs.h"
 #include <iostream>
 #include <ctime>
@@ -45,7 +45,7 @@ int main()
   int i,j;
   clock_t start;
   const bool gpusolve = true;
-  const bool cpusolve = true;
+  const bool cpusolve = false;
 
   // declare value (V) and policy (G) function matrices
   REAL* Vgpu = new REAL[nk*nz];

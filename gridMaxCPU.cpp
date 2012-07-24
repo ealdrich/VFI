@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      grid_max
+ Function      gridMaxCPU
 
- Usage         grid_max(klo, nksub, l, w, wmax, windmax, ydepK, K, Exp, V, G)
+ Usage         gridMaxCPU(klo, nksub, l, w, wmax, windmax, ydepK, K, Exp, V, G)
 
  Arguments     klo:     reference to constant integer which represents the
                         index corresponding to the lowest value of the capital
@@ -45,7 +45,7 @@
 	       argmax are stored in the value and policy functions,
 	       respectively.
 
- Dependencies  Global variables: eta, beta (globalvars.h).
+ Dependencies  Global variables: eta, beta (global.h).
 
                Functions:        pow (math.h).
 
@@ -61,14 +61,14 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include "auxfuncs.h"
 #include <math.h>
 
 // grid search maximization function
-void grid_max(const int& klo, const int& nksub, int& l, REAL& w,
-	      REAL& wmax, int& windmax, const REAL& ydepK,
-	      const REAL* K, const REAL* Exp, REAL* V, REAL* G)
+void gridMaxCPU(const int& klo, const int& nksub, int& l, REAL& w,
+		REAL& wmax, int& windmax, const REAL& ydepK,
+		const REAL* K, const REAL* Exp, REAL* V, REAL* G)
 {
   w = pow(ydepK-*(K+klo),1-eta)/(1-eta) + beta*(*Exp);
   wmax = w;

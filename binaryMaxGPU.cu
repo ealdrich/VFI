@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      binary_max
+ Function      binaryMaxGPU
 
- Usage         binary_max(klo, nksub, nz, ydepK, eta, beta, K, P, V0, V, G)
+ Usage         binaryMaxGPU(klo, nksub, nz, ydepK, eta, beta, K, P, V0, V, G)
 
  Arguments     klo:   constant integer which represents the index
                       corresponding to the lowest value of the capital grid
@@ -54,10 +54,12 @@
 
  ============================================================================*/
 
-__device__ void binary_max(const int klo, const int nksub, const int nz,
-			   const REAL ydepK, const REAL eta,
-			   const REAL beta, const REAL* K, const REAL* P,
-			   const REAL* V0, REAL* V, REAL* G)
+#include "global.h"
+
+__device__ void binaryMaxGPU(const int klo, const int nksub, const int nz,
+			     const REAL ydepK, const REAL eta,
+			     const REAL beta, const REAL* K, const REAL* P,
+			     const REAL* V0, REAL* V, REAL* G)
 {
   // binary search to find the vf max over K'
   // we assume that the value funtion is concave in capital

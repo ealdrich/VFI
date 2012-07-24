@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      vfInit
+ Function      vfInitGPU
 
- Usage         vfInit(nz, eta, beta, alpha, delta, Z, V)
+ Usage         vfInitGPU(nz, eta, beta, alpha, delta, Z, V)
 
  Arguments     nz:    constant integer representing number of values in TFP
                       grid.
@@ -36,9 +36,11 @@
 
  ============================================================================*/
 
-__global__ void vfInit(const int nz,  const REAL eta, const REAL beta,
-		       const REAL alpha, const REAL delta, const REAL* Z,
-		       REAL* V)
+#include "global.h"
+
+__global__ void vfInitGPU(const int nz,  const REAL eta, const REAL beta,
+			  const REAL alpha, const REAL delta, const REAL* Z,
+			  REAL* V)
 { 
   // thread
   const int i = blockIdx.x * blockDim.x + threadIdx.x;

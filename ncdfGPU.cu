@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      ncdf
+ Function      ncdfGPU
 
- Usage         ncdf(q)
+ Usage         ncdfGPU(q)
 
  Arguments     q: constant REAL representing a quantile of the normal
                   density.
@@ -22,8 +22,10 @@
 
  ============================================================================*/
 
+#include "global.h"
+
 // normal cdf
-__device__ REAL ncdfgpu(const REAL q)
+__device__ REAL ncdfGPU(const REAL q)
 {
 
  // quadrature nodes

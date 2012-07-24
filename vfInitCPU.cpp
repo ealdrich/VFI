@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      vfInit
+ Function      vfInitCPU
 
- Usage         vfInit(Z, V)
+ Usage         vfInitCPU(Z, V)
 
  Arguments     Z:     pointer to the array of REALs which stores the AR1
 	              grid values.
@@ -13,7 +13,7 @@
  Description   This function initializes the value function.
 
  Dependencies  Global Variables: eta, beta, alpha, delta, nk, nz
-                                 (globalvars.h).
+                                 (global.h).
 
 	       Functions:        pow (math.h).
 
@@ -29,10 +29,10 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include <math.h>
 
-void vfInit(const REAL* Z, REAL* V)
+void vfInitCPU(const REAL* Z, REAL* V)
 { 
 
   int i,j;

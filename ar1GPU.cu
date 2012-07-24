@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      ar1
+ Function      ar1GPU
 
- Usage         ar1(nz, lambda, mu, sigma, phi, Z, P)
+ Usage         ar1GPU(nz, lambda, mu, sigma, phi, Z, P)
 
  Arguments     nz:     constant integer representing number of values in the
                        AR1 approximation grid.
@@ -42,8 +42,11 @@
 
  ============================================================================*/
 
-__global__ void ar1(const int nz, const REAL lambda, const REAL mu,
-		    const REAL sigma, const REAL rho, REAL* Z, REAL* P)
+#include "global.h"
+#include "ncdfGPU.cu"
+
+__global__ void ar1GPU(const int nz, const REAL lambda, const REAL mu,
+		       const REAL sigma, const REAL rho, REAL* Z, REAL* P)
 { 
 
   // thread
@@ -62,12 +65,13 @@ __global__ void ar1(const int nz, const REAL lambda, const REAL mu,
 
   // transition matrix
   REAL normarg1, normarg2;
-  P[i*nz] = ncdfgpu((zmin - mu - rho*log(Z[i]))/sigma + 0.5*zstep/sigma);
+  normarg1 = (zmin - mu - rho*log(Z[i]))/sigma + 0.5*zstep/sigma;
+  P[i*nz] = ncdfGPU(normarg1);
   P[i*nz+nz-1] = 1-P[i*nz];
   for(j = 1 ; j < nz-1 ; ++j){
     normarg1 = (log(Z[j]) - mu - rho*log(Z[i]))/sigma + 0.5*zstep/sigma;
     normarg2 = (log(Z[j]) - mu - rho*log(Z[i]))/sigma - 0.5*zstep/sigma;
-    P[i*nz+j] = ncdfgpu(normarg1) - ncdfgpu(normarg2);
+    P[i*nz+j] = ncdfGPU(normarg1) - ncdfGPU(normarg2);
     P[i*nz+nz-1] -= P[i*nz+j];
   }
 }

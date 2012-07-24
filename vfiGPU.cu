@@ -19,8 +19,8 @@
                Functions:        pow (math.h);
 	                         cblas(S,D)axpy, cblasI(s,d)amax (cblas.h).
 
-	       Kernels:          ar1 (ar1.cu), kGrid (kGrid.cu),
-	                         vfInit(vfInit.cu), vfStep (vfStep.cu).
+	       Kernels:          ar1GPU (ar1.cu), kGridGPU (kGrid.cu),
+	                         vfInitGPU(vfInit.cu), vfStepGPU (vfStep.cu).
 
  Return value  Returns 0 upon successful completion, 1 otherwise.
 
@@ -34,28 +34,29 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
-#include "cublas.h"
+#include "global.h"
+#include "auxFuncs.h"
+#include "cublas_v2.h"
 #include <iostream>
 #include <ctime>
 #include <typeinfo>
 
 using namespace std;
 
-#include "ncdfgpu.cu"
-#include "binary_val.cu"
-#include "ar1.cu"
-#include "kGrid.cu"
-#include "vfInit.cu"
-#include "grid_max.cu"
-#include "binary_max.cu"
-#include "vfStep.cu"
+#include "ar1GPU.cu"
+#include "kGridGPU.cu"
+#include "vfInitGPU.cu"
+#include "vfStepGPU.cu"
 
 int vfiGPU(REAL* hV, REAL* hG) 
 { 
 
   int imax;
   REAL diff = 1.0;
+  cublasHandle_t handle;
+  cublasStatus_t status;
+  status = cublasCreate(&handle);
+  REAL negOne = -1.0;
 
   // pointers to variables in device memory
   REAL* K;
@@ -92,9 +93,9 @@ int vfiGPU(REAL* hV, REAL* hG)
 
   // compute TFP grid, capital grid and initial VF
   REAL lambda = 3;
-  ar1<<<dimGridZ,dimBlockZ>>>(nz,lambda,mu,sigma,rho,Z,P);
-  kGrid<<<dimGridK,dimBlockK>>>(nk,nz,beta,alpha,delta,Z,K);
-  vfInit<<<dimGridV,dimBlockV>>>(nz,eta,beta,alpha,delta,Z,V0);
+  ar1GPU<<<dimGridZ,dimBlockZ>>>(nz,lambda,mu,sigma,rho,Z,P);
+  kGridGPU<<<dimGridK,dimBlockK>>>(nk,nz,beta,alpha,delta,Z,K);
+  vfInitGPU<<<dimGridV,dimBlockV>>>(nz,eta,beta,alpha,delta,Z,V0);
 
   // iterate on the value function
   int count = 0;
@@ -102,13 +103,13 @@ int vfiGPU(REAL* hV, REAL* hG)
   start = clock();
   while(fabs(diff) > tol){
     if(count < 3 | count % howard == 0) how = false; else how = true;
-    vfStep<<<dimGridV,dimBlockV>>>(nk,nz,eta,beta,alpha,delta,maxtype,how,K,Z,P,V0,V,G);
+    vfStepGPU<<<dimGridV,dimBlockV>>>(nk,nz,eta,beta,alpha,delta,maxtype,how,K,Z,P,V0,V,G);
     if(typeid(realtype) == typeid(singletype)){
-      cublasSaxpy(nk*nz, -1.0, (float*)V, 1, (float*)V0, 1);
-      imax = cublasIsamax(nk*nz, (float*)V0, 1);
+      status = cublasSaxpy(handle, nk*nz, (float*)&negOne, (float*)V, 1, (float*)V0, 1);
+      status = cublasIsamax(handle, nk*nz, (float*)V0, 1, &imax);
     } else if(typeid(realtype) == typeid(doubletype)){
-      cublasDaxpy(nk*nz, -1.0, (double*)V, 1, (double*)V0, 1);
-      imax = cublasIdamax(nk*nz, (double*)V0, 1);
+      status = cublasDaxpy(handle, nk*nz, (double*)&negOne, (double*)V, 1, (double*)V0, 1);
+      status = cublasIdamax(handle, nk*nz, (double*)V0, 1, &imax);
     }
     cudaMemcpy(&diff, V0+imax, sizeof(REAL), cudaMemcpyDeviceToHost);
     Vtemp = V0;
@@ -139,6 +140,9 @@ int vfiGPU(REAL* hV, REAL* hG)
   cudaFree(V);
   cudaFree(Vtemp);
   cudaFree(G);
+  cublasDestroy(handle);
+
+  printMatrix<REAL>(0, nk, nz, &hV[0], 4, nz, 10);
 
   return 0;
 

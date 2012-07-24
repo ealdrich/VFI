@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      binary_val
+ Function      binaryValGPU
 
- Usage         binary_val(x, nx, X)
+ Usage         binaryValGPU(x, nx, X)
 
  Arguments     x:  constant REAL representing the value to search for in X.
                    
@@ -25,9 +25,11 @@
 
  ============================================================================*/
 
+#include "global.h"
+
 // function to find the index, ind, of X such that x <= X[ind]
 // assume that X is increasing
-__device__ int binary_val(const REAL x, const int n, const REAL* X)
+__device__ int binaryValGPU(const REAL x, const int n, const REAL* X)
 {
 
   int imax;

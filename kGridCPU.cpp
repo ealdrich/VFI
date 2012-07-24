@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      kGrid
+ Function      kGridCPU
 
- Usage         kGrid(Z, K)
+ Usage         kGridCPU(Z, K)
 
  Arguments     Z:     pointer to the array of constant REALs which stores
                       the AR1 grid values.	      
@@ -16,7 +16,7 @@
 	       of the TFP process (respectively), scaled by 0.95 and 1.05
 	       (respectively).
 
- Dependencies  Global variables: beta, alpha, delta, nk, nz (globalvars.h).
+ Dependencies  Global variables: beta, alpha, delta, nk, nz (global.h).
 
                Functions:        pow (math.h).
 
@@ -32,10 +32,10 @@
 
  ============================================================================*/
 
-#include "globalvars.h"
+#include "global.h"
 #include <math.h>
 
-void kGrid(const REAL* Z, REAL* K)
+void kGridCPU(const REAL* Z, REAL* K)
 {
 
   int i;

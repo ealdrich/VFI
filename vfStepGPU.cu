@@ -1,9 +1,9 @@
 /*============================================================================
 
- Function      vfStep
+ Function      vfStepGPU
 
- Usage         vfStep(nk, nz, eta, beta, alpha, delta, maxtype, howard, K, Z,
-                      P, V0, V, G)
+ Usage         vfStepGPU(nk, nz, eta, beta, alpha, delta, maxtype, howard, K,
+                         Z, P, V0, V, G)
 
  Arguments     nk:      constant integer length of the capital grid.
 
@@ -54,9 +54,9 @@
 	       processors that are not parallelizable. Maximization is
 	       performed by either a grid search or binary search algorithm.
 
- Dependencies  Kernels:          binary_val (binary_val.cu),
-	                         grid_max (grid_max.cu),
-				 binary_max (binary_max.cu).
+ Dependencies  Kernels:          binaryValGPU (binary_val.cu),
+	                         gridMaxGPU (grid_max.cu),
+				 binaryMaxGPU (binary_max.cu).
 	                         
 
  Return value  void.
@@ -71,13 +71,18 @@
 
  ============================================================================*/
 
+#include "global.h"
+#include "binaryValGPU.cu"
+#include "gridMaxGPU.cu"
+#include "binaryMaxGPU.cu"
+
 // kernel for updating the value function
-__global__ void vfStep(const int nk, const int nz, const REAL eta,
-		       const REAL beta, const REAL alpha,
-		       const REAL delta, const char maxtype,
-		       const bool howard, const REAL* K, const REAL* Z,
-		       const REAL* P, const REAL* V0, REAL* V,
-		       REAL* G) 
+__global__ void vfStepGPU(const int nk, const int nz, const REAL eta,
+			  const REAL beta, const REAL alpha,
+			  const REAL delta, const char maxtype,
+			  const bool howard, const REAL* K, const REAL* Z,
+			  const REAL* P, const REAL* V0, REAL* V,
+			  REAL* G) 
 {
   // thread
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -91,18 +96,18 @@ __global__ void vfStep(const int nk, const int nz, const REAL eta,
 
     // impose constraints on grid for future capital
     const int klo = 0;
-    int khi = binary_val(ydepK, nk, K); // nonnegativity of C
+    int khi = binaryValGPU(ydepK, nk, K); // nonnegativity of C
     if(K[khi] > ydepK) khi -= 1;
     const int nksub = khi-klo+1;
 
     // maximization either via grid (g), of binary search (b)
     // if binary, turn off policy iteration (to preserve concavity)
     if(maxtype == 'g'){
-      grid_max(klo, nksub, nz, ydepK, eta, beta, K, (P+j*nz), (V0+klo*nz),
-	       (V+i*nz+j), (G+i*nz+j));
-    } else if(maxtype == 'b'){
-      binary_max(klo, nksub, nz, ydepK, eta, beta, K, (P+j*nz), (V0+klo*nz),
+      gridMaxGPU(klo, nksub, nz, ydepK, eta, beta, K, (P+j*nz), (V0+klo*nz),
 		 (V+i*nz+j), (G+i*nz+j));
+    } else if(maxtype == 'b'){
+      binaryMaxGPU(klo, nksub, nz, ydepK, eta, beta, K, (P+j*nz), (V0+klo*nz),
+		   (V+i*nz+j), (G+i*nz+j));
     }
 
   // iterate on the policy function on non-howard steps

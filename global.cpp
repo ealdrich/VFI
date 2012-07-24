@@ -11,7 +11,7 @@
  Date:         28 July 2011
 
  ============================================================================*/
-#include "globalvars.h"
+#include "global.h"
 
 // economic parameters
 const int np = 6; // number of parameters
@@ -25,15 +25,15 @@ const REAL sigma = 0.005; // TFP volatility
 
 // computational parameters
 const int block_size = 4;
-const int nk = 256; // this should be integer multiple of block_size
+const int nk = 1024; // this should be integer multiple of block_size
 const int nz = 4;
 const REAL tol = 0.00000001*(1-beta);
 
 // maximization parameters
-const char maxtype = 'g'; // maximization method - choices are 'g' (grid) and 'b' (binary search)
-const int howard = 20; // maximize every how many steps? set howard = 1 if max = 'b'.
+const char maxtype = 'b'; // maximization method - choices are 'g' (grid) and 'b' (binary search)
+const int howard = 1; // maximize every how many steps? set howard = 1 if max = 'b'.
 
 // to determine whether single or double precision is being used
-//const float singletype;
-//const double doubletype;
-//const REAL realtype;
+const float singletype;
+const double doubletype;
+const REAL realtype;

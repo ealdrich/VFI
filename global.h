@@ -1,7 +1,7 @@
 #ifndef __FILE_GLOBALVARS_H_SEEN__
 #define __FILE_GLOBALVARS_H_SEEN__
 
-typedef float REAL;
+typedef double REAL;
 
 // economic parameters
 extern const int np;

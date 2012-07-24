@@ -1,8 +1,8 @@
 /*============================================================================
 
- Function      kGrid
+ Function      kGridGPU
 
- Usage         kGrid(nk, nz, beta, alpha, delta, Z, K)
+ Usage         kGridGPU(nk, nz, beta, alpha, delta, Z, K)
 
  Arguments     nk:    constant integer representing number of values in
                       capital grid.
@@ -40,9 +40,11 @@
 
  ============================================================================*/
 
-__global__ void kGrid(const int nk, const int nz, const REAL beta,
-		      const REAL alpha, const REAL delta, const REAL* Z,
-		      REAL* K) 
+#include "global.h"
+
+__global__ void kGridGPU(const int nk, const int nz, const REAL beta,
+			 const REAL alpha, const REAL delta, const REAL* Z,
+			 REAL* K) 
 {
   // thread
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
