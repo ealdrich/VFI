@@ -1,10 +1,17 @@
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file global.h
+///
+/// @brief Global header file.
+///
+//////////////////////////////////////////////////////////////////////////////
+
 #ifndef __FILE_GLOBALVARS_H_SEEN__
 #define __FILE_GLOBALVARS_H_SEEN__
 
 typedef double REAL;
 
 // economic parameters
-extern const int np;
 extern const REAL eta;
 extern const REAL beta;
 extern const REAL alpha;

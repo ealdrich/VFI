@@ -1,36 +1,13 @@
-/*============================================================================
-
- Function      main
-
- Description   Solves a standard stochastic ramsey model via value function
-               iteration on a CPU and/or GPU. The flags 'gpusolve' and
-	       'cpusolve' allow the user to solve the the problem on only the
-	       CPU, the GPU or both. The maximization step at each  iteration
-	       of the algorithm is carried out by a grid or binary search
-	       method. The variable 'max' specifies the type of maximation
-	       method to use, and is defined in 'global.cpp'. Economic
-	       variables and grid sizes are also defined in 'global.cpp'.
-
- Dependencies  Global variables: nk, nz (global.h).
-
-               Functions:        clock() (ctime.h);
-	                         cblas_(s,d)axpy, cblas_i(s,d)amax (cblas.h);
-				 vfiCPU, vfiGPU (auxfuncs.h).
-
- Return value  Returns 0 upon successful completion, 1 otherwise.
-
- =============================================================================
-
- Author:       Eric M. Aldrich
-
- Contact:      ealdrich@gmail.com
-
- Date:         28 July 2011
-
- ============================================================================*/
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file main.cpp
+///
+/// @brief File containing main main function for the VFI problem.
+///
+//////////////////////////////////////////////////////////////////////////////
 
 #include "global.h"
-#include "auxfuncs.h"
+#include "auxFuncs.h"
 #include <iostream>
 #include <ctime>
 #include <typeinfo>
@@ -38,6 +15,35 @@
 
 using namespace std;
 
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @fn main()
+///
+/// @brief Main function for the VFI problem.
+///
+/// @details Solves a standard stochastic ramsey model via value function
+/// iteration on a CPU and/or GPU. The flags 'gpusolve' and 'cpusolve' allow
+/// the user to solve the the problem on only the CPU, the GPU or both. The
+/// maximization step at each  iteration of the algorithm is carried out by
+/// a grid or binary search method. The variable 'max' specifies the type of
+/// maximation method to use, and is defined in 'global.cpp'. Economic
+/// variables and grid sizes are also defined in 'global.cpp'.
+///
+/// @returns 0 upon successful complete, 1 otherwise.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 24 July 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
 int main()
 {
 

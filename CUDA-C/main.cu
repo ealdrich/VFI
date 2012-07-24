@@ -1,39 +1,3 @@
-/*============================================================================
-
- Function      vfiGPU
-
- Usage         vfiGPU(hV, hG)
-
- Arguments     hV: pointer to array of REALs storing the value function.
-                   
-               hG: pointer to array of REALs storing the policy function.
-	              
- Description   This function performs value function iteration on the GPU,
-               finding the maximum of the Bellman objective function for each
-	       node in the state space and iterating until convergence.
-
- Dependencies  Global Variables: eta, beta, alpha, delta, mu, rho, sigma,
-                                 block_size, nk, nz, tol, maxtype, howard
-				 (globalvas.h).
-
-               Functions:        pow (math.h);
-	                         cblas(S,D)axpy, cblasI(s,d)amax (cblas.h).
-
-	       Kernels:          ar1GPU (ar1.cu), kGridGPU (kGrid.cu),
-	                         vfInitGPU(vfInit.cu), vfStepGPU (vfStep.cu).
-
- Return value  Returns 0 upon successful completion, 1 otherwise.
-
- =============================================================================
-
- Author:       Eric M. Aldrich
-
- Contact:      ealdrich@gmail.com
-
- Date:         28 July 2011
-
- ============================================================================*/
-
 #include "global.h"
 #include "auxFuncs.h"
 #include "cublas_v2.h"
@@ -43,14 +7,40 @@
 
 using namespace std;
 
-#include "ar1GPU.cu"
-#include "kGridGPU.cu"
-#include "vfInitGPU.cu"
-#include "vfStepGPU.cu"
+#include "ar1.cu"
+#include "kGrid.cu"
+#include "vfInit.cu"
+#include "vfStep.cu"
 
-int vfiGPU(REAL* hV, REAL* hG) 
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @fn main()
+///
+/// @brief Main function for the VFI problem.
+///
+/// @details This function performs value function iteration on the GPU,
+/// finding the maximum of the Bellman objective function for each node in
+/// the state space and iterating until convergence.
+///
+/// @returns 0 upon successful complete, 1 otherwise.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 24 July 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+int main()
 { 
 
+  // admin
   int imax;
   REAL diff = 1.0;
   cublasHandle_t handle;
@@ -121,6 +111,8 @@ int vfiGPU(REAL* hV, REAL* hG)
   V = V0;
   
   // copy value and policy functions to host memory
+  REAL* V = new REAL[nk*nz];
+  REAL* G = new REAL[nk*nz];
   cudaMemcpy(hV, V, sizeV, cudaMemcpyDeviceToHost);
   cudaMemcpy(hG, G, sizeG, cudaMemcpyDeviceToHost);
 

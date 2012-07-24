@@ -6,8 +6,8 @@ LCUDA    = /usr/local/cuda/lib
 CPUFLAGS = -O2 -c -I$(SDIR)
 GPUFLAGS = -O2 -m64 -c -I$(SDIR) -I$(ICUDA) --gpu-architecture sm_11
 LFLAGS   = -L$(LCUDA) -lcublas -lm -lgslcblas
-HEADERS  = $(SDIR)/auxfuncs.h $(SDIR)/global.h
-OBJECTS  = vfiGPU.o vfiCPU.o ar1.o kGrid.o vfInit.o binary_val.o ncdf.o vfStep.o grid_max.o binary_max.o global.o
+HEADERS  = $(SDIR)/auxFuncs.h $(SDIR)/global.h
+OBJECTS  = vfiGPU.o vfiCPU.o ar1.o kGrid.o vfInit.o binary_val.o vfStep.o grid_max.o binary_max.o global.o
 
 vfi : 		vfi.o $(OBJECTS) $(HEADERS)
 		$(GPUCC) -m64 -o vfi vfi.o $(OBJECTS) $(LFLAGS) 
@@ -32,9 +32,6 @@ vfInit.o : 	$(SDIR)/vfInit.cpp  $(HEADERS)
 
 binary_val.o : 	$(SDIR)/binary_val.cpp  $(HEADERS)
 		$(CPUCC) $(CPUFLAGS) $(SDIR)/binary_val.cpp
-
-ncdf.o : 	$(SDIR)/ncdf.cpp  $(HEADERS)
-		$(CPUCC) $(CPUFLAGS) $(SDIR)/ncdf.cpp
 
 vfStep.o : 	$(SDIR)/vfStep.cpp  $(HEADERS)
 		$(CPUCC) $(CPUFLAGS) $(SDIR)/vfStep.cpp

@@ -1,65 +1,49 @@
-/*============================================================================
-
- Function      binaryMaxGPU
-
- Usage         binaryMaxGPU(klo, nksub, nz, ydepK, eta, beta, K, P, V0, V, G)
-
- Arguments     klo:   constant integer which represents the index
-                      corresponding to the lowest value of the capital grid
-		      over which to maximize.
-
-	       nksub: constant integer length of the subgrid of capital
-	              (beginning at klo) over which to maximize.
-
-	       nz:    constant integer length of the TFP grid.
-
-	       ydepK: constant REAL which stores the value of output plus
-	              capital net of depreciation.
-
-	       eta:   constant REAL representing risk aversion.
-
-	       beta:  constant REAL representing the discount factor.	       
-
-	       K:     pointer to array of constant REALs which stores the
-	              grid of capital values.
-
-	       P:     pointer to constant REAL array which stores the TFP
-	              transition matrix.
-
-	       V0:    pointer to constant REAL array which stores the
-	              current value function.
-
-	       V:     pointer to the array of REALs which represents the
-	              value function.
-
-	       G:     pointer to the array of REALs which represents the
-	              policy function.
-	              
- Description   This is a CUDA device function that finds the maximum and
-               argmax of utility over a specified subgrid of capital by using
-	       a binary search algorithm. The algorithm requires concavity and
-	       cannot be used with the howard improvement method. The max and
-	       argmax are stored in the value and policy functions,
-	       respectively.
-
- Return value  void.
-
- =============================================================================
-
- Author:       Eric M. Aldrich
-
- Contact:      ealdrich@gmail.com
-
- Date:         28 July 2011
-
- ============================================================================*/
-
 #include "global.h"
 
-__device__ void binaryMaxGPU(const int klo, const int nksub, const int nz,
-			     const REAL ydepK, const REAL eta,
-			     const REAL beta, const REAL* K, const REAL* P,
-			     const REAL* V0, REAL* V, REAL* G)
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @brief CUDA device function to compute maximum of Bellman objective via
+/// binary search.
+///
+/// @details This CUDA device function finds the maximum and argmax of
+/// utility over a specified subgrid of capital by using a binary search
+/// algorithm. The algorithm requires concavity and cannot be used with the
+/// howard improvement method. The max and argmax are stored in the value and
+/// policy functions, respectively.
+///
+/// @param klo index corresponding to the lowest value of the capital grid
+/// over which to maximize.
+/// @param nksub length of the subgrid of capital (beginning at klo) over
+/// which to maximize.
+/// @param nz length of the TFP grid.
+/// @param ydepK value of output plus capital net of depreciation.
+/// @param eta risk aversion parameter.
+/// @param beta discount factor.	       
+/// @param K pointer to grid of capital values.
+/// @param P pointer to TFP  transition matrix.
+/// @param V0 pointer to current value function.
+/// @param V pointer to updated value function (output).
+/// @param G pointer to updated policy function (output).
+///
+/// @returns Void.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 24 July 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+__device__ void binaryMax(const int klo, const int nksub, const int nz,
+			  const REAL ydepK, const REAL eta,
+			  const REAL beta, const REAL* K, const REAL* P,
+			  const REAL* V0, REAL* V, REAL* G)
 {
   // binary search to find the vf max over K'
   // we assume that the value funtion is concave in capital
