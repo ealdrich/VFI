@@ -21,6 +21,7 @@ extern const REAL rho;
 extern const REAL sigma;
 
 // computational parameters
+extern const int block_size;
 extern const int nk;
 extern const int nz;
 extern const REAL tol;

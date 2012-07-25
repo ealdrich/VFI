@@ -16,7 +16,7 @@ LFLAGS += -lcuda -lcudart -lcublas -lgslcblas -L$(LCUDA)
 CPPFLAGS = -O1 -g -c -I$(ICUDA)
 
 # List of all the objects you need
-OBJECTS  = vfiGPU.o vfiCPU.o ar1CPU.o kGridCPU.o vfInitCPU.o binaryValCPU.o vfStepCPU.o gridMaxCPU.o binaryMaxCPU.o global.o
+OBJECTS  = global.o
 
 # Rule that tells make how to make the program from the objects
 main :	main.o $(OBJECTS)

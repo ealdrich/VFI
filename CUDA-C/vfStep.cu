@@ -1,7 +1,7 @@
 #include "global.h"
 #include "binaryVal.cu"
-#include "gridMax.cu"
 #include "binaryMax.cu"
+#include "gridMax.cu"
 
 //////////////////////////////////////////////////////////////////////////////
 ///
@@ -67,17 +67,17 @@ __global__ void vfStep(const int nk, const int nz, const REAL eta,
 
     // impose constraints on grid for future capital
     const int klo = 0;
-    int khi = binaryValGPU(ydepK, nk, K); // nonnegativity of C
+    int khi = binaryVal(ydepK, nk, K); // nonnegativity of C
     if(K[khi] > ydepK) khi -= 1;
     const int nksub = khi-klo+1;
 
     // maximization either via grid (g), of binary search (b)
     // if binary, turn off policy iteration (to preserve concavity)
     if(maxtype == 'g'){
-      gridMaxGPU(klo, nksub, nz, ydepK, eta, beta, K, (P+j*nz), (V0+klo*nz),
+      gridMax(klo, nksub, nz, ydepK, eta, beta, K, (P+j*nz), (V0+klo*nz),
 		 (V+i*nz+j), (G+i*nz+j));
     } else if(maxtype == 'b'){
-      binaryMaxGPU(klo, nksub, nz, ydepK, eta, beta, K, (P+j*nz), (V0+klo*nz),
+      binaryMax(klo, nksub, nz, ydepK, eta, beta, K, (P+j*nz), (V0+klo*nz),
 		   (V+i*nz+j), (G+i*nz+j));
     }
 

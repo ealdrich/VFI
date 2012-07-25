@@ -1,9 +1,9 @@
 #include "global.h"
-#include "auxFuncs.h"
 #include "cublas_v2.h"
 #include <iostream>
 #include <ctime>
 #include <typeinfo>
+#include <fstream>
 
 using namespace std;
 
@@ -49,13 +49,7 @@ int main()
   REAL negOne = -1.0;
 
   // pointers to variables in device memory
-  REAL* K;
-  REAL* Z;
-  REAL* P;
-  REAL* V0;
-  REAL* V;
-  REAL* G;
-  REAL* Vtemp;
+  REAL *K, *Z, *P, *V0, *V, *G, *Vtemp;
 
   // allocate variables in device memory
   size_t sizeK = nk*sizeof(REAL);
@@ -83,9 +77,9 @@ int main()
 
   // compute TFP grid, capital grid and initial VF
   REAL lambda = 3;
-  ar1GPU<<<dimGridZ,dimBlockZ>>>(nz,lambda,mu,sigma,rho,Z,P);
-  kGridGPU<<<dimGridK,dimBlockK>>>(nk,nz,beta,alpha,delta,Z,K);
-  vfInitGPU<<<dimGridV,dimBlockV>>>(nz,eta,beta,alpha,delta,Z,V0);
+  ar1<<<dimGridZ,dimBlockZ>>>(nz,lambda,mu,sigma,rho,Z,P);
+  kGrid<<<dimGridK,dimBlockK>>>(nk,nz,beta,alpha,delta,Z,K);
+  vfInit<<<dimGridV,dimBlockV>>>(nz,eta,beta,alpha,delta,Z,V0);
 
   // iterate on the value function
   int count = 0;
@@ -93,7 +87,7 @@ int main()
   start = clock();
   while(fabs(diff) > tol){
     if(count < 3 | count % howard == 0) how = false; else how = true;
-    vfStepGPU<<<dimGridV,dimBlockV>>>(nk,nz,eta,beta,alpha,delta,maxtype,how,K,Z,P,V0,V,G);
+    vfStep<<<dimGridV,dimBlockV>>>(nk,nz,eta,beta,alpha,delta,maxtype,how,K,Z,P,V0,V,G);
     if(typeid(realtype) == typeid(singletype)){
       status = cublasSaxpy(handle, nk*nz, (float*)&negOne, (float*)V, 1, (float*)V0, 1);
       status = cublasIsamax(handle, nk*nz, (float*)V0, 1, &imax);
@@ -111,8 +105,8 @@ int main()
   V = V0;
   
   // copy value and policy functions to host memory
-  REAL* V = new REAL[nk*nz];
-  REAL* G = new REAL[nk*nz];
+  REAL* hV = new REAL[nk*nz];
+  REAL* hG = new REAL[nk*nz];
   cudaMemcpy(hV, V, sizeV, cudaMemcpyDeviceToHost);
   cudaMemcpy(hG, G, sizeG, cudaMemcpyDeviceToHost);
 
@@ -134,7 +128,22 @@ int main()
   cudaFree(G);
   cublasDestroy(handle);
 
-  printMatrix<REAL>(0, nk, nz, &hV[0], 4, nz, 10);
+  // write to file (column major)
+  ofstream fileValue, filePolicy;
+  fileValue.open("valueFunc.dat");
+  filePolicy.open("policyFunc.dat");
+  fileValue << nk << endl;
+  fileValue << nz << endl;
+  filePolicy << nk << endl;
+  filePolicy << nz << endl;
+  for(int j = 0 ; j < nz ; ++j){
+    for(int i = 0 ; i < nk ; ++i){
+      fileValue << hV[i*nz+j] << endl;
+      filePolicy << hG[i*nz+j] << endl;
+    }
+  }  
+  fileValue.close();
+  filePolicy.close();
 
   return 0;
 

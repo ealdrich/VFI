@@ -13,6 +13,7 @@
 #include <typeinfo>
 #include <gsl/gsl_cblas.h>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -84,14 +85,31 @@ int main()
     V = Vtemp;
     ++count;
   }
-  //V = V0; // this assignment doesn't work sometimes (it works in GPU code)
 
+  //V = V0; // this assignment doesn't work sometimes (it works in GPU code)
   // i resort to a full copy in lieu of pointer reassignemnt
   for(i = 0 ; i < nk ; ++i){
     for(j = 0 ; j < nz ; ++j){
       V[i*nz+j] = V0[i*nz+j];
     }
   }
+
+  // write to file (column major)
+  ofstream fileValue, filePolicy;
+  fileValue.open("valueFunc.dat");
+  filePolicy.open("policyFunc.dat");
+  fileValue << nk << endl;
+  fileValue << nz << endl;
+  filePolicy << nk << endl;
+  filePolicy << nz << endl;
+  for(j = 0 ; j < nz ; ++j){
+    for(i = 0 ; i < nk ; ++i){
+      fileValue << V[i*nz+j] << endl;
+      filePolicy << G[i*nz+j] << endl;
+    }
+  }  
+  fileValue.close();
+  filePolicy.close();
 
   return 0;
 

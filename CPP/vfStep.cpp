@@ -73,6 +73,7 @@ void vfStep(const bool& howard, const REAL* K, const REAL* Z,
 	nksub = khi-klo+1;
 
 	// continuation value for subgrid
+	Exp = NULL;
 	Exp = (REAL*)realloc(Exp, nksub*sizeof(REAL));
 	if(typeid(realtype) == typeid(singletype)){
 	  cblas_sgemv(CblasRowMajor, CblasNoTrans, nksub, nz, 1.0, ((float*)V0+klo*nz),
@@ -85,8 +86,7 @@ void vfStep(const bool& howard, const REAL* K, const REAL* Z,
 	// maximization either via grid (g), of binary search (b)
 	// if binary, turn off policy iteration (to preserve concavity)
 	if(maxtype == 'g'){
-	  gridMax(klo, nksub, ydepK, K, Exp, V+i*nz+j,
-		     G+i*nz+j);
+	  gridMax(klo, nksub, ydepK, K, Exp, V+i*nz+j, G+i*nz+j);
 	} else if (maxtype == 'b'){
 	  binaryMax(klo, nksub, ydepK, K, Exp, V+i*nz+j, G+i*nz+j);
 	}

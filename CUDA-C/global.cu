@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @file global.cpp
+/// @file global.cu
 ///
 /// @brief Global variables for the value function iteration problem.
 ///
@@ -30,6 +30,7 @@ const REAL rho = 0.95; ///< TFP persistence.
 const REAL sigma = 0.005; ///< TFP volatility.
 
 // computational parameters
+const int block_size = 4; ///< Block size for CUDA kernel.
 const int nk = 1024; ///< Number of values in capital grid.
 const int nz = 4; ///< Number of values TFP grid.
 const REAL tol = 1e-8*(1-beta); ///< Tolerance for convergence.
