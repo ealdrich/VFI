@@ -1,0 +1,32 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Edited files
+*~
+*.swp
+.DS_Store
+
+# Ignore temporary LyX files which have format #filename.lyx#
+*.lyx?
+
+# Derived files
+*.pdf
+
+# Image Directories
+images
+VisualImages
+
+# Archives
+*.gz
+*.tar
+*.zip
