@@ -30,10 +30,7 @@ using namespace std;
 /// grid of values for the state space, with each thread finding the
 /// maximum of the Bellman objective function for a pair of state values.
 ///
-/// @details See Aldrich, Eric M., Jesus Fernandez-Villaverde,
-/// A. Ronald Gallant and Juan F. Rubio-Ramirez (2011), "Tapping the
-/// supercomputer under your desk: Solving dynamic equilibrium models with
-/// graphics processors", Journal of Economic Dynamics & Control, 35, 386-393.
+/// @details See @cite Aldrich2011.
 ///
 /// @see functors.hpp
 ///
