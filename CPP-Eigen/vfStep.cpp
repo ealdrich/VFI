@@ -1,12 +1,12 @@
 #include "global.h"
-#include "auxFuncs.h"
 #include <math.h>
 #include <iostream>
 #include <typeinfo>
-#include <gsl/gsl_cblas.h>
+#include <Eigen/Dense>
 #include <stdlib.h>
 
 using namespace std;
+using namespace Eigen;
 
 //////////////////////////////////////////////////////////////////////////////
 ///
@@ -46,61 +46,47 @@ using namespace std;
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void vfStep(const bool& howard, const REAL* K, const REAL* Z,
-	    const REAL* P, const REAL* V0, REAL* V, REAL* G)
+void vfStep(const bool& howard, const VectorXR& K, const VectorXR& Z,
+	    const MatrixXR& P, const MatrixXR& V0, MatrixXR& V,
+	    MatrixXR& G)
 {
+
+  // output and depreciated capital
+  MatrixXR ydepK = (K.array().pow(alpha)).matrix()*Z.transpose();
+  ydepK.colwise() += (1-delta)*K;
+
   int klo, khi, nksub;
-  REAL ydepK;
-  REAL* Exp;
+  VectorXR Exp, w;
+  VectorXR::Index indMax;
   for(int i = 0 ; i < nk ; ++i){
     for(int j = 0 ; j < nz ; ++j){
-
-      // output and depreciated capital
-      ydepK = Z[j]*pow(K[i],alpha) + (1-delta)*K[i];
 
       // maximize on non-howard steps
       if(howard == false){
 
 	// impose constraints on grid for future capital
 	klo = 0;
-	khi = binaryVal(ydepK, nk, K); // consumption nonnegativity
-	if(K[khi] > ydepK) khi -= 1;
+	khi = binaryVal(ydepK(i,j), nk, K); // consumption nonnegativity
+	if(K[khi] > ydepK(i,j)) khi -= 1;
 
 	// further restrict capital grid via monotonicity (CPU only)
 	if(i > 0){
-	  if(G[(i-1)*nz+j] > klo & G[(i-1)*nz+j] < khi) klo = (int)G[(i-1)*nz+j];
+	  if(G(i-1,j) > klo & G(i-1,j) < khi) klo = (int)G(i-1,j);
 	}
 	nksub = khi-klo+1;
 
 	// continuation value for subgrid
-	Exp = NULL;
-	Exp = (REAL*)realloc(Exp, nksub*sizeof(REAL));
-	
-	if(typeid(realtype) == typeid(singletype)){
-	  cblas_sgemv(CblasRowMajor, CblasNoTrans, nksub, nz, 1.0, ((float*)V0+klo*nz),
-		      nz, ((float*)P+j*nz), 1, 0.0, (float*)Exp, 1);
-	} else if(typeid(realtype) == typeid(doubletype)){
-	  cblas_dgemv(CblasRowMajor, CblasNoTrans, nksub, nz, 1.0, ((double*)V0+klo*nz),
-		      nz, ((double*)P+j*nz), 1, 0.0, (double*)Exp, 1);
-	}
-	
-	// maximization either via grid (g), of binary search (b)
-	// if binary, turn off policy iteration (to preserve concavity)
-	if(maxtype == 'g'){
-	  gridMax(klo, nksub, ydepK, K, Exp, V+i*nz+j, G+i*nz+j);
-	} else if (maxtype == 'b'){
-	  binaryMax(klo, nksub, ydepK, K, Exp, V+i*nz+j, G+i*nz+j);
-	}
+	Exp = V0.block(klo, 0, nksub, nz)*P.row(j).transpose();
+
+	// maximization
+	w = (((ydepK(i,j)*VectorXR::Constant(nksub,1) - K.segment(klo, nksub)).array().pow(1-eta))/(1-eta)).matrix() + beta*Exp;
+	V(i,j) = w.maxCoeff(&indMax);
+	G(i,j) = indMax+klo;
 
       // iterate on the policy function on non-howard steps
       } else {
-	Exp = (REAL*)realloc(Exp, sizeof(REAL));
-	if(typeid(realtype) == typeid(singletype)){
-	  Exp[0] = cblas_sdot(nz, ((float*)V0+(int)G[i*nz+j]*nz), 1, ((float*)P+j*nz), 1);
-	} else if(typeid(realtype) == typeid(doubletype)){
-	  Exp[0] = cblas_ddot(nz, ((double*)V0+(int)G[i*nz+j]*nz), 1, ((double*)P+j*nz), 1);
-	}	
-	V[i*nz+j] = pow(ydepK-K[(int)G[i*nz+j]],1-eta)/(1-eta) + beta*Exp[0];
+	Exp = V0.row(G(i,j))*P.row(j).transpose();
+	V(i,j) = pow(ydepK(i,j)-K(G(i,j)),1-eta)/(1-eta) + beta*Exp(0);
       }
     }
   }

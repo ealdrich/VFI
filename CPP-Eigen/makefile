@@ -2,18 +2,14 @@
 CPP  = g++
 SDIR = .
 
-# Paths to headers and libraries
-IGSL = /usr/include
-LGSL = /usr/lib64
-
-# Add CUDA libraries to the link line
-LFLAGS += -L$(LGSL) -lgslcblas
+# Eigen Headers
+EIG_INC = /usr/local/Eigen
 
 # Include standard optimization flags
-CPPFLAGS = -O2 -g -c -I$(IGSL) -I$(SDIR)
+CPPFLAGS = -O2 -g -c -I$(EIG_INC) -I$(SDIR)
 
 # List of all the objects you need
-OBJECTS  = ar1.o kGrid.o vfInit.o binaryVal.o vfStep.o gridMax.o binaryMax.o global.o timer.o
+OBJECTS  = ar1.o kGrid.o vfInit.o binaryVal.o vfStep.o global.o timer.o
 
 # Rule that tells make how to make the program from the objects
 main :	main.o $(OBJECTS)

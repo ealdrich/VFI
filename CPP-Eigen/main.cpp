@@ -7,11 +7,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "global.h"
-#include "auxFuncs.h"
 #include <math.h>
 #include <ctime>
 #include <typeinfo>
-#include <gsl/gsl_cblas.h>
+#include <Eigen/Dense>
 #include <iostream>
 #include <fstream>
 
@@ -52,13 +51,12 @@ int main()
   double tic = curr_second(); // Start time
 
   // allocate variables in host memory
-  REAL* K = new REAL[nk];
-  REAL* Z = new REAL[nz];
-  REAL* P = new REAL[(int)pow(nz,2)];
-  REAL* V0 = new REAL[nk*nz];
-  REAL* Vtemp;
-  REAL* V = new REAL[nk*nz];
-  REAL* G = new REAL[nk*nz];
+  VectorXR K(nk);
+  VectorXR Z(nz);
+  MatrixXR P(nz, nz);
+  MatrixXR V0(nk, nz);
+  MatrixXR V(nk, nz);
+  MatrixXR G(nk, nz);
 
   // compute TFP grid, capital grid and initial VF
   REAL lambda = 3;
@@ -72,17 +70,8 @@ int main()
   while(fabs(diff) > tol){
     if(count < 3 | count % howard == 0) how = false; else how = true;
     vfStep(how, K, Z, P, V0, V, G);
-    if(typeid(realtype) == typeid(singletype)){
-      cblas_saxpy(nk*nz, -1.0, (float*)V, 1, (float*)V0, 1);
-      imax = cblas_isamax(nk*nz, (float*)V0, 1);
-    } else if(typeid(realtype) == typeid(doubletype)){
-      cblas_daxpy(nk*nz, -1.0, (double*)V, 1, (double*)V0, 1);
-      imax = cblas_idamax(nk*nz, (double*)V0, 1);
-    }	
-    diff = *(V0+imax);
-    Vtemp = V0;
+    diff = (V-V0).array().abs().maxCoeff();
     V0 = V;
-    V = Vtemp;
     ++count;
     //cout << "Iteration: " << count << ", Max Value Function Diff: " << diff << endl;
   }
@@ -92,14 +81,6 @@ int main()
   //cout << endl;
   //cout << "Solution Time: " << solTime << endl;
   cout << endl;
-
-  //V = V0; // this assignment doesn't work sometimes (it works in GPU code)
-  // i resort to a full copy in lieu of pointer reassignemnt
-  for(i = 0 ; i < nk ; ++i){
-    for(j = 0 ; j < nz ; ++j){
-      V[i*nz+j] = V0[i*nz+j];
-    }
-  }
 
   // write to file (column major)
   ofstream fileValue, filePolicy;
@@ -111,8 +92,8 @@ int main()
   filePolicy << nz << endl;
   for(j = 0 ; j < nz ; ++j){
     for(i = 0 ; i < nk ; ++i){
-      fileValue << V[i*nz+j] << endl;
-      filePolicy << G[i*nz+j] << endl;
+      fileValue << V(i,j) << endl;
+      filePolicy << G(i,j) << endl;
     }
   }  
   fileValue.close();

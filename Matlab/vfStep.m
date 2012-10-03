@@ -36,7 +36,7 @@ function [V,G] = vfStep(alpha, beta, delta, eta, howard, K, Z, P, V0, G0)
                 G(i,j) = G(i,j)+klo-1;
             
             else
-                Exp = V0(G0(i,j),:)*P(:,j);
+	        Exp = V0(G0(i,j),:)*P(j,:)';
                 V(i,j) = ((ydepK(i,j)-K(G0(i,j)))^(1-eta))/(1-eta) + beta*Exp(1);
             end
         

@@ -9,9 +9,23 @@
 #ifndef __FILE_GLOBALVARS_H_SEEN__
 #define __FILE_GLOBALVARS_H_SEEN__
 
+#include <Eigen/Dense>
+
 typedef double REAL;
+typedef Eigen::Matrix<REAL, Eigen::Dynamic, 1> VectorXR;
+typedef Eigen::Matrix<REAL, 1, Eigen::Dynamic> RowVectorXR;
+typedef Eigen::Matrix<REAL, Eigen::Dynamic, Eigen::Dynamic> MatrixXR;
+typedef Eigen::Array<REAL, Eigen::Dynamic, 1> ArrayXR;
+typedef Eigen::Array<REAL, Eigen::Dynamic, Eigen::Dynamic> ArrayXXR;
 
 REAL curr_second (void);
+void ar1(const REAL& lambda, VectorXR& Z, MatrixXR& P);
+void kGrid(const VectorXR& Z, VectorXR& K);
+void vfInit(const VectorXR& Z, MatrixXR& V);
+void vfStep(const bool& howard, const VectorXR& K, const VectorXR& Z,
+	    const MatrixXR& P, const MatrixXR& V0, MatrixXR& V,
+	    MatrixXR& G);
+int binaryVal(const REAL& x, const int& nx, const VectorXR& X);
 
 // economic parameters
 extern const REAL eta;
