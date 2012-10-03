@@ -1,11 +1,16 @@
-# Use icpc to compile .cpp files
-CPP  = icpc
+# Use g++ to compile .cpp files
+CPP  = g++
+SDIR = .
+
+# Paths to headers and libraries
+IGSL = /opt/local/include
+LGSL = /opt/local/lib
 
 # Add CUDA libraries to the link line
-LFLAGS += -lgslcblas
+LFLAGS += -L$(LGSL) -lgslcblas
 
 # Include standard optimization flags
-CPPFLAGS = -O1 -g -c
+CPPFLAGS = -O2 -g -c -I$(IGSL) -I$(SDIR)
 
 # List of all the objects you need
 OBJECTS  = ar1.o kGrid.o vfInit.o binaryVal.o vfStep.o gridMax.o binaryMax.o global.o
