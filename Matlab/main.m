@@ -13,6 +13,7 @@ nz = 4; % Number of values TFP grid.
 tol = 1e-8*(1-beta); % Tolerance for convergence.
 
 % maximization parameters
+matlabMax = 0;
 maxtype = 'b'; % Maximization method - choices are 'g'
                %(grid) and 'b' (binary search).
 howard = 1; % Number of howard steps to perform between
@@ -38,7 +39,7 @@ while(abs(diff) > tol)
     else
         how = true;
     end
-    [V, G] = vfStep(alpha, beta, delta, eta, how, K, Z, P, V0,G0);
+    [V, G] = vfStep(alpha, beta, delta, eta, matlabMax, maxtype, how, K, Z, P, V0,G0);
     diff = max(max(abs(V-V0)));
     V0 = V;
     G0 = G;

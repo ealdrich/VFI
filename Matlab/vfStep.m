@@ -1,4 +1,4 @@
-function [V,G] = vfStep(alpha, beta, delta, eta, howard, K, Z, P, V0, G0)
+function [V,G] = vfStep(alpha, beta, delta, eta, matlabMax, maxtype, howard, K, Z, P, V0, G0)
 
     nk = size(K,2);
     nz = size(Z,2);
@@ -31,12 +31,20 @@ function [V,G] = vfStep(alpha, beta, delta, eta, howard, K, Z, P, V0, G0)
                 Exp = V0(klo:khi, :)*P(j,:)';
            
                 % maximization
-                w = ((ydepK(i,j)*ones(nksub,1) - K(klo:khi)').^(1-eta))/(1-eta) + beta*Exp;
-                [V(i,j), G(i,j)] = max(w);
-                G(i,j) = G(i,j)+klo-1;
+                if(matlabMax)
+                    w = ((ydepK(i,j)*ones(nksub,1) - K(klo:khi)').^(1-eta))/(1-eta) + beta*Exp;
+                    [V(i,j), G(i,j)] = max(w);
+                    G(i,j) = G(i,j)+klo-1;
+                else
+                    if(maxtype == 'g')
+                        [V(i,j), G(i,j)] = gridMax(beta, eta, klo, nksub, ydepK(i,j), K, Exp);
+                    elseif(maxtype == 'b')
+                        [V(i,j), G(i,j)] = binaryMax(beta, eta, klo, nksub, ydepK(i,j), K, Exp);
+                    end
+                end
             
             else
-	        Exp = V0(G0(i,j),:)*P(j,:)';
+                Exp = V0(G0(i,j),:)*P(j,:)';
                 V(i,j) = ((ydepK(i,j)-K(G0(i,j)))^(1-eta))/(1-eta) + beta*Exp(1);
             end
         
