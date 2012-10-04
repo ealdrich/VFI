@@ -35,9 +35,10 @@ const int nz = 4; ///< Number of values TFP grid.
 const REAL tol = 1e-8*(1-beta); ///< Tolerance for convergence.
 
 // maximization parameters
-const char maxtype = 'b'; ///< @brief Maximization method - choices are 'g'
+const bool eigenMax = false;
+const char maxtype = 'g'; ///< @brief Maximization method - choices are 'g'
                           /// (grid) and 'b' (binary search).
-const int howard = 1; ///< @brief Number of howard steps to perform between
+const int howard = 20; ///< @brief Number of howard steps to perform between
                        ///  maximizations - set howard = 1 if max = 'b'.
 
 // to determine whether single or double precision is being used

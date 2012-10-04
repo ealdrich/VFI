@@ -15,6 +15,7 @@
 #include <fstream>
 
 using namespace std;
+using namespace Eigen;
 
 //////////////////////////////////////////////////////////////////////////////
 ///
@@ -56,7 +57,7 @@ int main()
   MatrixXR P(nz, nz);
   MatrixXR V0(nk, nz);
   MatrixXR V(nk, nz);
-  MatrixXR G(nk, nz);
+  MatrixXi G(nk, nz);
 
   // compute TFP grid, capital grid and initial VF
   REAL lambda = 3;
@@ -78,8 +79,8 @@ int main()
 
   REAL toc = curr_second();
   REAL solTime  = toc - tic;
-  //cout << endl;
-  //cout << "Solution Time: " << solTime << endl;
+  cout << endl;
+  cout << "Solution Time: " << solTime << endl;
   cout << endl;
 
   // write to file (column major)

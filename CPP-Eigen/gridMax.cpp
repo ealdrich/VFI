@@ -1,6 +1,8 @@
 #include "global.h"
-#include "auxFuncs.h"
+#include <Eigen/Dense>
 #include <math.h>
+
+using namespace Eigen;
 
 //////////////////////////////////////////////////////////////////////////////
 ///
@@ -32,17 +34,17 @@
 ///
 //////////////////////////////////////////////////////////////////////////////
 void gridMax(const int& klo, const int& nksub, const REAL& ydepK,
-		const REAL* K, const REAL* Exp, REAL* V, REAL* G)
+		const VectorXR& K, const VectorXR& Exp, REAL& V, int& G)
 {
-  REAL w = pow(ydepK-*(K+klo),1-eta)/(1-eta) + beta*(*Exp);
+  REAL w = pow(ydepK-K(klo),1-eta)/(1-eta) + beta*Exp(0);
   REAL wmax = w;
   int windmax = 0;
   for(int l = 1 ; l < nksub ; ++l){
-    w = pow(ydepK-*(K+klo+l),1-eta)/(1-eta) + beta*(*(Exp+l));
+    w = pow(ydepK-K(klo+l),1-eta)/(1-eta) + beta*Exp(l);
     if(w > wmax){
       wmax = w;
       windmax = l;         }
   }
-  *V = wmax;
-  *G = klo+windmax;
+  V = wmax;
+  G = klo+windmax;
 }

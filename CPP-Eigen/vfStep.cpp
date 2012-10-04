@@ -48,7 +48,7 @@ using namespace Eigen;
 //////////////////////////////////////////////////////////////////////////////
 void vfStep(const bool& howard, const VectorXR& K, const VectorXR& Z,
 	    const MatrixXR& P, const MatrixXR& V0, MatrixXR& V,
-	    MatrixXR& G)
+	    MatrixXi& G)
 {
 
   // output and depreciated capital
@@ -71,7 +71,7 @@ void vfStep(const bool& howard, const VectorXR& K, const VectorXR& Z,
 
 	// further restrict capital grid via monotonicity (CPU only)
 	if(i > 0){
-	  if(G(i-1,j) > klo & G(i-1,j) < khi) klo = (int)G(i-1,j);
+	  if(G(i-1,j) > klo & G(i-1,j) < khi) klo = G(i-1,j);
 	}
 	nksub = khi-klo+1;
 
@@ -79,9 +79,17 @@ void vfStep(const bool& howard, const VectorXR& K, const VectorXR& Z,
 	Exp = V0.block(klo, 0, nksub, nz)*P.row(j).transpose();
 
 	// maximization
-	w = (((ydepK(i,j)*VectorXR::Constant(nksub,1) - K.segment(klo, nksub)).array().pow(1-eta))/(1-eta)).matrix() + beta*Exp;
-	V(i,j) = w.maxCoeff(&indMax);
-	G(i,j) = indMax+klo;
+	if(eigenMax){
+	  w = (((ydepK(i,j)*VectorXR::Constant(nksub,1) - K.segment(klo, nksub)).array().pow(1-eta))/(1-eta)).matrix() + beta*Exp;
+	  V(i,j) = w.maxCoeff(&indMax);
+	  G(i,j) = indMax+klo;
+	} else {
+	  if(maxtype == 'g'){
+	    gridMax(klo, nksub, ydepK(i,j), K, Exp, V(i,j), G(i,j));
+	  } else if (maxtype == 'b') {
+	    binaryMax(klo, nksub, ydepK(i,j), K, Exp, V(i,j), G(i,j));
+	  }
+	}
 
       // iterate on the policy function on non-howard steps
       } else {

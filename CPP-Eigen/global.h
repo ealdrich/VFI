@@ -24,8 +24,12 @@ void kGrid(const VectorXR& Z, VectorXR& K);
 void vfInit(const VectorXR& Z, MatrixXR& V);
 void vfStep(const bool& howard, const VectorXR& K, const VectorXR& Z,
 	    const MatrixXR& P, const MatrixXR& V0, MatrixXR& V,
-	    MatrixXR& G);
+	    Eigen::MatrixXi& G);
 int binaryVal(const REAL& x, const int& nx, const VectorXR& X);
+void gridMax(const int& klo, const int& nksub, const REAL& ydepK,
+	     const VectorXR& K, const VectorXR& Exp, REAL& V, int& G);
+void binaryMax(const int& klo, const int& nksub, const REAL& ydepK,
+	       const VectorXR& K, const VectorXR& Exp, REAL& V, int& G);
 
 // economic parameters
 extern const REAL eta;
@@ -42,6 +46,7 @@ extern const int nz;
 extern const REAL tol;
 
 // maximization parameters
+extern const bool eigenMax;
 extern const char maxtype;
 extern const int howard;
 

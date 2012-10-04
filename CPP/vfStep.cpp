@@ -94,13 +94,12 @@ void vfStep(const bool& howard, const REAL* K, const REAL* Z,
 
       // iterate on the policy function on non-howard steps
       } else {
-	Exp = (REAL*)realloc(Exp, sizeof(REAL));
 	if(typeid(realtype) == typeid(singletype)){
 	  Exp[0] = cblas_sdot(nz, ((float*)V0+(int)G[i*nz+j]*nz), 1, ((float*)P+j*nz), 1);
 	} else if(typeid(realtype) == typeid(doubletype)){
 	  Exp[0] = cblas_ddot(nz, ((double*)V0+(int)G[i*nz+j]*nz), 1, ((double*)P+j*nz), 1);
 	}	
-	V[i*nz+j] = pow(ydepK-K[(int)G[i*nz+j]],1-eta)/(1-eta) + beta*Exp[0];
+	V[i*nz+j] = pow(ydepK-K[(int)G[i*nz+j]],1-eta)/(1-eta) + beta*(Exp[0]);
       }
     }
   }

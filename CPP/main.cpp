@@ -89,8 +89,8 @@ int main()
 
   REAL toc = curr_second();
   REAL solTime  = toc - tic;
-  //cout << endl;
-  //cout << "Solution Time: " << solTime << endl;
+  cout << endl;
+  cout << "Solution Time: " << solTime << endl;
   cout << endl;
 
   //V = V0; // this assignment doesn't work sometimes (it works in GPU code)

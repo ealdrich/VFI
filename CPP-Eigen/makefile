@@ -9,7 +9,7 @@ EIG_INC = /usr/local/Eigen
 CPPFLAGS = -O2 -g -c -I$(EIG_INC) -I$(SDIR)
 
 # List of all the objects you need
-OBJECTS  = ar1.o kGrid.o vfInit.o binaryVal.o vfStep.o global.o timer.o
+OBJECTS  = ar1.o kGrid.o vfInit.o binaryVal.o vfStep.o binaryMax.o gridMax.o global.o timer.o
 
 # Rule that tells make how to make the program from the objects
 main :	main.o $(OBJECTS)
