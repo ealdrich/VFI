@@ -24,166 +24,12 @@
 #include <thrust/iterator/zip_iterator.h>
 #include <thrust/for_each.h>
 #include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
 #include <cmath>
+#include "global.h"
+#include <stdio.h>
 
 using namespace std;
-
-//////////////////////////////////////////////////////////////////////////////
-///
-/// @brief Functor to compute discrete AR1 approximation.
-///
-/// @details This functor provides the kernel to compute a discrete AR1
-/// approximation using the method of Tauchen (1986).
-///
-//////////////////////////////////////////////////////////////////////////////
-template <typename T>
-struct ar1Vals
-{
-  // Arguments
-  const int nz; ///< Number of values in AR1 grid.
-  const T lambda; ///< Number of standard deviations for AR1 approximation.
-  const T mu; ///< AR1 mean.
-  const T sigma; ///< AR1 standard deviation.
-  const T rho; ///< AR1 persistence.
-
-  /// Constructor
-  ar1Vals(int _nz, T _lambda, T _mu, T _sigma, T _rho)
-  : nz(_nz), lambda(_lambda), mu(_mu), sigma(_sigma), rho(_rho) {}
-
-  /// Kernel to compute discrete AR1 approximation (using Tauchen's method).
-  /// @param ix index of the AR1 grid.
-  /// @return Value of the AR1 process at position ix in the grid.
-  __host__ __device__
-  T operator()(const int& ix) const 
-  { 
-    const T sigma_z = sigma/sqrt(1-pow(rho,2));
-    const T mu_z = mu*(1/(1-rho));
-    const T zmin = mu_z - lambda*sigma_z;
-    const T zmax = mu_z + lambda*sigma_z;
-    const T zstep = (zmax-zmin)/(nz-1);
-    return (T)std::exp(zmin + zstep*ix);
-  }
-};
-
-//////////////////////////////////////////////////////////////////////////////
-///
-/// @brief Functor to compute transition matrix for discrete AR1
-/// approximation.
-///
-/// @details This functor provides the kernel to compute the transition matrix
-/// for a a discrete AR1 approximation using the method of Tauchen (1986).
-///
-//////////////////////////////////////////////////////////////////////////////
-template <typename T>
-struct transMat
-{
-  // Attributes
-  const int nz; ///< Number of values in AR1 grid.
-  const T mu; ///< AR1 mean.
-  const T sigma; ///< AR1 standard deviation.
-  const T rho; ///< AR1 persistence.
-  T* Z; ///< Pointer to AR1 grid.
-  T* P; ///< Pointer to transition matrix.
-
-  /// Constructor
-  transMat(int _nz, T _mu, T _sigma, T _rho, T* _Z, T* _P)
-  : nz(_nz), mu(_mu), sigma(_sigma), rho(_rho), Z(_Z), P(_P) {}
-
-  /// Kernel to compute transition matrix for discrete AR1 approximation
-  /// (using Tauchen's method).
-  /// @param ix index of the AR1 grid.
-  /// @return Void.
-  __host__ __device__
-  void operator()(const int& ix) const 
-  { 
-    const T zstep = (log(Z[nz-1])-log(Z[0]))/(nz-1);
-    int jx;
-    REAL normarg1, normarg2;
-    normarg1 = (log(Z[0]) - mu - rho*log(Z[ix]))/sigma + 0.5*zstep/sigma;
-    P[ix] = 0.5 + 0.5*erf(normarg1/pow(2,0.5));
-    P[ix+nz*(nz-1)] = 1-P[ix];
-    for(jx = 1 ; jx < nz-1 ; ++jx){
-      normarg1 = (log(Z[jx]) - mu - rho*log(Z[ix]))/sigma + 0.5*zstep/sigma;
-      normarg2 = (log(Z[jx]) - mu - rho*log(Z[ix]))/sigma - 0.5*zstep/sigma;
-      P[ix+jx*nz] = 0.5*erf(normarg1/pow(2,0.5)) - 0.5*erf(normarg2/pow(2,0.5));
-      P[ix+nz*(nz-1)] -= P[ix+jx*nz];
-    }
-  }
-
-};
-
-//////////////////////////////////////////////////////////////////////////////
-///
-/// @brief Functor to compute grid values for capital.
-///
-/// @details This functor provides the kernel to compute an equally spaced
-/// grid for capital.
-///
-//////////////////////////////////////////////////////////////////////////////
-template <typename T>
-struct kGrid
-{
-  // Attributes
-  const int nk; ///< Number of values in capital grid.
-  const int nz; ///< Number of values in AR1 (TFP) grid.
-  const T beta; ///< Time discount factor.
-  const T alpha; ///< Capital share in production function.
-  const T delta; ///< Depreciation rate.
-  const T* Z; ///< Pointer to AR1 (TFP) grid.
-
-  /// Constructor
-  kGrid(int _nk, int _nz, T _beta, T _alpha, T _delta, T* _Z)
-  : nk(_nk), nz(_nz), beta(_beta), alpha(_alpha), delta(_delta), Z(_Z) {}
-
-  /// Kernel to compute each K value in grid.
-  /// @param ix index of the AR1 grid.
-  /// @return Value of capital at position ix in the grid.
-  __host__ __device__
-  T operator()(const int& ix) const 
-  { 
-    const T kmin = 0.95*pow((1/(alpha*Z[0]))*((1/beta)-1+delta),1/(alpha-1));
-    const T kmax = 1.05*pow((1/(alpha*Z[nz-1]))*((1/beta)-1+delta),1/(alpha-1));
-    const T kstep = (kmax-kmin)/(nk-1);
-    return kmin + kstep*ix;
-  }
-};
-
-//////////////////////////////////////////////////////////////////////////////
-///
-/// @brief Functor to initialize the value function.
-///
-/// @details This functor intializes the value function at the deterministic
-/// steady state, for each value of the AR1 (TFP) grid.
-///
-//////////////////////////////////////////////////////////////////////////////
-template <typename T>
-struct vfInit
-{
-  // Attributes
-  const int nk; ///< Number of values in capital grid.
-  const T eta; ///< Coefficient of relative risk aversion.
-  const T beta; ///< Time discount factor.
-  const T alpha; ///< Capital share in production function.
-  const T delta; ///< Depreciation rate.
-  const T* Z; ///< Pointer to AR1 (TFP) grid.
-  T* V; ///< Pointer to current iteration of the value function.
-
-  /// Constructor
-  vfInit(int _nk, T _eta, T _beta, T _alpha, T _delta, T* _Z, T* _V)
-  : nk(_nk), eta(_eta), beta(_beta), alpha(_alpha), delta(_delta), Z(_Z), V(_V) {}
-
-  /// Kernel to initialize value function.
-  /// @param jx index of the AR1 (TFP) grid.
-  /// @return Void.
-  __host__ __device__
-  void operator()(const int& jx) const 
-  {
-    int ix;
-    const T Kj = pow((1/(alpha*Z[jx]))*((1/beta)-1+delta),1/(alpha-1));
-    const T Vj = pow(Z[jx]*pow(Kj, alpha) - delta*Kj,1-eta)/(1-eta);
-    for(ix = 0 ; ix < nk ; ++ix) V[ix+jx*nk] = Vj;
-  }
-};
 
 //////////////////////////////////////////////////////////////////////////////
 ///
@@ -243,18 +89,18 @@ struct vfStep
       
       // impose constraints on grid for future capital
       const int klo = 0;
-      int khi = binary_val(ydepK, nk, &K[0]); // nonnegativity of C
+      int khi = binary_val(ydepK, nk, K); // nonnegativity of C
       if(K[khi] > ydepK) khi -= 1;
       const int nksub = khi-klo+1;
 
       // maximization either via grid (g), or binary search (b)
       // if binary, turn off policy iteration (to preserve concavity)
       if(maxtype == 'g'){
-	grid_max(klo, nksub, nk, nz, ydepK, eta, beta, &K[0], (&P[0]+jx),
-		 (&V0[0]+klo), (&V[0]+ix+jx*nk), (&G[0]+ix+jx*nk));
+	grid_max(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
+		 V0+klo, V+ix+jx*nk, G+ix+jx*nk);
       } else if(maxtype == 'b'){
-	binary_max(klo, nksub, nk, nz, ydepK, eta, beta, &K[0], (&P[0]+jx),
-	   (&V0[0]+klo), (&V[0]+ix+jx*nk), (&G[0]+ix+jx*nk));
+	binary_max(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
+	   V0+klo, V+ix+jx*nk, G+ix+jx*nk);
       }
 
       // iterate on the policy function on non-howard steps
@@ -342,8 +188,7 @@ template <typename T>
 __host__ __device__
 void grid_max(const int klo, const int nksub, const int nk,
 	      const int nz, const T ydepK, const T eta,
-	      const T beta, const T* K, const T* P,
-	      const T* V0, T* V, T* G)
+	      const T beta, const T* K, const T* P, const T* V0, T* V, T* G)
 {
   T Exp = 0.0, w, wmax;
   int l, m, windmax;
@@ -391,8 +236,7 @@ template <typename T>
 __host__ __device__
 void binary_max(const int klo, const int nksub, const int nk,
 		const int nz, const T ydepK, const T eta,
-		const T beta, const T* K, const T* P,
-		const T* V0, T* V, T* G)
+		const T beta, const T* K, const T* P,const T* V0, T* V, T* G)
 {
   // binary search to find the vf max over K'
   // we assume that the value funtion is concave in capital

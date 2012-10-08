@@ -41,7 +41,7 @@ __global__ void ar1(const int nz, const REAL lambda, const REAL mu,
   int j;
 
   // grid for TFP
-  const REAL sigma_z = sigma/sqrt(1-pow(rho,2));
+  const REAL sigma_z = sigma/pow(1-pow(rho,2), 0.5);
   const REAL mu_z = mu*(1/(1-rho));
   const REAL zmin = mu_z - lambda*sigma_z;
   const REAL zmax = mu_z + lambda*sigma_z;
@@ -53,12 +53,12 @@ __global__ void ar1(const int nz, const REAL lambda, const REAL mu,
   // transition matrix
   REAL normarg1, normarg2;
   normarg1 = (zmin - mu - rho*log(Z[i]))/sigma + 0.5*zstep/sigma;
-  P[i*nz] = 0.5 + 0.5*erf(normarg1/pow(2,0.5));
+  P[i*nz] = 0.5 + 0.5*erf(normarg1/sqrt((REAL)2));
   P[i*nz+nz-1] = 1-P[i*nz];
   for(j = 1 ; j < nz-1 ; ++j){
     normarg1 = (log(Z[j]) - mu - rho*log(Z[i]))/sigma + 0.5*zstep/sigma;
     normarg2 = (log(Z[j]) - mu - rho*log(Z[i]))/sigma - 0.5*zstep/sigma;
-    P[i*nz+j] = 0.5*erf(normarg1/pow(2,0.5)) - 0.5*erf(normarg2/pow(2,0.5));
+    P[i*nz+j] = 0.5*erf(normarg1/sqrt((REAL)2)) - 0.5*erf(normarg2/sqrt((REAL)2));
     P[i*nz+nz-1] -= P[i*nz+j];
   }
 }

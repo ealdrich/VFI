@@ -12,6 +12,7 @@
 #include <ctime>
 #include "functors.hpp"
 #include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
 #include <thrust/transform.h>
 #include <thrust/for_each.h>
 #include <thrust/sequence.h>
@@ -60,47 +61,32 @@ int main()
   REAL diff = 1.0;
 
   // Allocate variables in device memory
-  thrust::device_vector<REAL> K(nk);
-  thrust::device_vector<REAL> Z(nz);
-  thrust::device_vector<REAL> P(nz*nz);
-  thrust::device_vector<REAL> V(nk*nz);
-  thrust::device_vector<REAL> G(nk*nz);
-  thrust::device_vector<REAL> V0(nk*nz);
-  thrust::device_vector<REAL>::iterator maxIter;
+  REAL tic = curr_second(); // Start timer
+  thrust_vectorXR K(nk);
+  thrust_vectorXR Z(nz);
+  thrust_vectorXR P(nz*nz);
+  thrust_vectorXR V(nk*nz);
+  thrust_vectorXR G(nk*nz);
+  thrust_vectorXR V0(nk*nz);
+  thrust_vectorXi seq_vec(nk*nz);
+  thrust::sequence(seq_vec.begin(), seq_vec.end());
+  thrust_vectorXR::iterator maxIter;
 
   // Compute TFP grid (Z)
-  double lambda = 3;
-  thrust::counting_iterator<int> counter(0);
-  thrust::transform(counter, counter+nz,
-		    Z.begin(), // output destination
-		    ar1Vals<REAL>(nz, lambda, mu, sigma, rho));
-
-  // Compute transition matrix (P)
-  thrust::for_each(counter, counter+nz,
-		   transMat<REAL>(nz, mu, sigma, rho,
-				  raw_pointer_cast(&Z[0]), raw_pointer_cast(&P[0])));
-
-  // Compute capital grid (K)
-  thrust::transform(counter, counter+nk,
-		    K.begin(), // output destination
-		    kGrid<REAL>(nk, nz, beta, alpha, delta, raw_pointer_cast(&Z[0])));
-
-  // Initialize value function
-  thrust::for_each(counter, counter+nz,
-  		   vfInit<REAL>(nk, eta, beta, alpha, delta,
-				raw_pointer_cast(&Z[0]), raw_pointer_cast(&V0[0])));
+  REAL lambda = 3;
+  ar1(lambda, Z, P);
+  kGrid(Z, K);
+  vfInit(Z, V0);
 
   // iterate on the value function
   int count = 0;
   bool how = false;
-  REAL tic = curr_second(); // Start counting time needed to compute the solution
   while(fabs(diff) > tol){
     if(count < 3 | count % howard == 0) how = false; else how = true;
-    thrust::for_each(counter, counter+nk*nz,
+    thrust::for_each(seq_vec.begin(), seq_vec.end(),
 		     vfStep<REAL>(nk, nz, eta, beta, alpha, delta, maxtype, how,
-				  raw_pointer_cast(&K[0]), raw_pointer_cast(&Z[0]),  
-				  raw_pointer_cast(&P[0]), raw_pointer_cast(&V0[0]), 
-				  raw_pointer_cast(&V[0]), raw_pointer_cast(&G[0])));
+				  thrust_ptr(K), thrust_ptr(Z), thrust_ptr(P),
+				  thrust_ptr(V0), thrust_ptr(V), thrust_ptr(G)));
     thrust::transform(V.begin(), V.end(), V0.begin(), V0.begin(), abs_diff<REAL>());
     maxIter = thrust::max_element(V0.begin(), V0.end());
     diff = *maxIter;

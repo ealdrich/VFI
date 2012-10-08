@@ -1,22 +1,22 @@
 # Use icpc to compile .cpp files
-CPP  = icpc
+CPP  = g++
 
 # Use nvcc to compile .cu files
 NVCC = nvcc
 NVCCFLAGS = -arch sm_20 # For fermi's in keeneland
 
 # Add CUDA Paths
-ICUDA = /sw/keeneland/cuda/4.0/linux_binary/include
-LCUDA = /sw/keeneland/cuda/4.0/linux_binary/lib64
+ICUDA = /usr/local/cuda/include
+LCUDA = /usr/local/cuda/lib64
 
 # Add CUDA libraries to the link line
 LFLAGS += -lcuda -lcudart -L$(LCUDA)
 
 # Include standard optimization flags
-CPPFLAGS = -O1 -g -c -I$(ICUDA)
+CPPFLAGS = -O3 -c -I$(ICUDA)
 
 # List of all the objects you need
-OBJECTS  = global.o timer.o
+OBJECTS  = global.o timer.o ar1.o kGrid.o vfInit.o
 
 # Rule that tells make how to make the program from the objects
 main :	main.o $(OBJECTS)
