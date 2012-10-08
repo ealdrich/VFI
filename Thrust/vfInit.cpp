@@ -1,7 +1,6 @@
 #include "global.h"
 #include <math.h>
 #include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
 
 //////////////////////////////////////////////////////////////////////////////
 ///
@@ -25,7 +24,8 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void vfInit(const thrust_vectorXR& Z, thrust_vectorXR& V)
+void vfInit(const thrust::device_vector<REAL>& Z,
+	    thrust::device_vector<REAL>& V)
 { 
 
   int ix,jx;

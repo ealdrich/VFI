@@ -62,15 +62,15 @@ int main()
 
   // Allocate variables in device memory
   REAL tic = curr_second(); // Start timer
-  thrust_vectorXR K(nk);
-  thrust_vectorXR Z(nz);
-  thrust_vectorXR P(nz*nz);
-  thrust_vectorXR V(nk*nz);
-  thrust_vectorXR G(nk*nz);
-  thrust_vectorXR V0(nk*nz);
-  thrust_vectorXi seq_vec(nk*nz);
+  thrust::device_vector<REAL> K(nk);
+  thrust::device_vector<REAL> Z(nz);
+  thrust::device_vector<REAL> P(nz*nz);
+  thrust::device_vector<REAL> V(nk*nz);
+  thrust::device_vector<REAL> G(nk*nz);
+  thrust::device_vector<REAL> V0(nk*nz);
+  thrust::device_vector<int> seq_vec(nk*nz);
   thrust::sequence(seq_vec.begin(), seq_vec.end());
-  thrust_vectorXR::iterator maxIter;
+  thrust::device_vector<REAL>::iterator maxIter;
 
   // Compute TFP grid (Z)
   REAL lambda = 3;
@@ -85,8 +85,9 @@ int main()
     if(count < 3 | count % howard == 0) how = false; else how = true;
     thrust::for_each(seq_vec.begin(), seq_vec.end(),
 		     vfStep<REAL>(nk, nz, eta, beta, alpha, delta, maxtype, how,
-				  thrust_ptr(K), thrust_ptr(Z), thrust_ptr(P),
-				  thrust_ptr(V0), thrust_ptr(V), thrust_ptr(G)));
+				  raw_pointer_cast(&K[0]), raw_pointer_cast(&Z[0]),
+				  raw_pointer_cast(&P[0]), raw_pointer_cast(&V0[0]),
+				  raw_pointer_cast(&V[0]), raw_pointer_cast(&G[0])));
     thrust::transform(V.begin(), V.end(), V0.begin(), V0.begin(), abs_diff<REAL>());
     maxIter = thrust::max_element(V0.begin(), V0.end());
     diff = *maxIter;

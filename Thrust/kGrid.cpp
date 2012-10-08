@@ -1,7 +1,6 @@
 #include "global.h"
 #include <math.h>
 #include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
 
 //////////////////////////////////////////////////////////////////////////////
 ///
@@ -30,7 +29,8 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void kGrid(const thrust_vectorXR& Z, thrust_vectorXR& K)
+void kGrid(const thrust::device_vector<REAL>& Z,
+	   thrust::device_vector<REAL>& K)
 {
 
   int i;
