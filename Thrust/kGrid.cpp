@@ -29,11 +29,18 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void kGrid(const thrust::device_vector<REAL>& Z,
+void kGrid(const parameters& param, const thrust::device_vector<REAL>& Z,
 	   thrust::device_vector<REAL>& K)
 {
 
   int i;
+
+  // basic parameters
+  const int nk = param.nk;
+  const int nz = param.nz;
+  const REAL alpha = param.alpha;
+  const REAL beta = param.beta;
+  const REAL delta = param.delta;
 
   // initial grid for capital
   REAL kmin = 0.95*pow((1/(alpha*Z[0]))*((1/beta)-1+delta),1/(alpha-1));

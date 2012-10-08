@@ -9,6 +9,7 @@
 #include "global.h"
 #include "auxFuncs.h"
 #include <iostream>
+#include <fstream>
 #include <ctime>
 #include "functors.hpp"
 #include <thrust/device_vector.h>
@@ -57,8 +58,14 @@ int main()
 { 
 
   // Admin
-  //int imax;
+  int ix, jx;
   REAL diff = 1.0;
+
+  // Read parameters
+  parameters params;
+  params.load("../parameters.txt");
+  int nk = params.nk;
+  int nz = params.nz;
 
   // Allocate variables in device memory
   REAL tic = curr_second(); // Start timer
@@ -73,18 +80,17 @@ int main()
   thrust::device_vector<REAL>::iterator maxIter;
 
   // Compute TFP grid (Z)
-  REAL lambda = 3;
-  ar1(lambda, Z, P);
-  kGrid(Z, K);
-  vfInit(Z, V0);
+  ar1(params, Z, P);
+  kGrid(params, Z, K);
+  vfInit(params, Z, V0);
 
   // iterate on the value function
   int count = 0;
   bool how = false;
-  while(fabs(diff) > tol){
-    if(count < 3 | count % howard == 0) how = false; else how = true;
+  while(fabs(diff) > params.tol){
+    if(count < 3 | count % params.howard == 0) how = false; else how = true;
     thrust::for_each(seq_vec.begin(), seq_vec.end(),
-		     vfStep<REAL>(nk, nz, eta, beta, alpha, delta, maxtype, how,
+		     vfStep<REAL>(params,
 				  raw_pointer_cast(&K[0]), raw_pointer_cast(&Z[0]),
 				  raw_pointer_cast(&P[0]), raw_pointer_cast(&V0[0]),
 				  raw_pointer_cast(&V[0]), raw_pointer_cast(&G[0])));
@@ -95,13 +101,31 @@ int main()
     ++count;
     //cout << "Iteration: " << count << ", Diff: " << diff << endl;
   }
-  REAL toc = curr_second();
-  cout << "Solution Time: " << toc - tic << endl;
-  V = V0;
 
-  thrust::host_vector<REAL> hV = V;
-  printMatrix<REAL>(1, nk, nz, &hV[0], 4, nz, 10);
-  
+  // Compute solution time
+  REAL toc = curr_second();
+  REAL solTime  = toc - tic;
+
+  // write to file (column major)
+  ofstream fileSolTime, fileValue, filePolicy;
+  fileSolTime.open("solutionTime.dat");
+  fileValue.open("valueFunc.dat");
+  filePolicy.open("policyFunc.dat");
+  fileSolTime << solTime << endl;
+  fileValue << nk << endl;
+  fileValue << nz << endl;
+  filePolicy << nk << endl;
+  filePolicy << nz << endl;
+  for(jx = 0 ; jx < nz ; ++jx){
+    for(ix = 0 ; ix < nk ; ++ix){
+      fileValue << V[ix+jx*nk] << endl;
+      filePolicy << G[ix+jx*nk] << endl;
+    }
+  }  
+  fileSolTime.close();
+  fileValue.close();
+  filePolicy.close();
+
   return 0;
 
 }

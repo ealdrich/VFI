@@ -13,30 +13,22 @@
 
 typedef double REAL;
 
+// Class for storing economic and computational parameters of the model
+class parameters{
+ public:
+  REAL eta, beta, alpha, delta, mu, rho, sigma, lambda, tol;
+  int nk, nz, howard;
+  char maxtype;
+  void load(char*);
+};
+
+// Function declarations
 REAL curr_second (void);
-void ar1(const REAL& lambda, thrust::device_vector<REAL>& Z,
+void ar1(const parameters& param, thrust::device_vector<REAL>& Z,
 	 thrust::device_vector<REAL>& P);
-void kGrid(const thrust::device_vector<REAL>& Z,
+void kGrid(const parameters& param, const thrust::device_vector<REAL>& Z,
 	   thrust::device_vector<REAL>& K);
-void vfInit(const thrust::device_vector<REAL>& Z,
+void vfInit(const parameters& param, const thrust::device_vector<REAL>& Z,
 	    thrust::device_vector<REAL>& V);
-
-// economic parameters
-extern const REAL eta;
-extern const REAL beta;
-extern const REAL alpha;
-extern const REAL delta;
-extern const REAL mu;
-extern const REAL rho;
-extern const REAL sigma;
-
-// computational parameters
-extern const int nk;
-extern const int nz;
-extern const REAL tol;
-
-// maximization parameters
-extern const char maxtype;
-extern const int howard;
 
 #endif

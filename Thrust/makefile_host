@@ -13,14 +13,14 @@ LCUDA = /usr/local/cuda/lib64
 LFLAGS += -lcuda -lcudart -L$(LCUDA) -lgomp
 
 # Include standard optimization flags
-CPPFLAGS = -O3 -c -I$(ICUDA)
+CPPFLAGS = -O3 -c -I$(ICUDA) -Xcompiler -fopenmp -DTHRUST_DEVICE_BACKEND=THRUST_DEVICE_BACKEND_OMP
 
 # List of all the objects you need
-OBJECTS  = timer.o ar1.o kGrid.o vfInit.o parameters.o
+OBJECTS  = global.o timer.o ar1.o kGrid.o vfInit.o
 
 # Rule that tells make how to make the program from the objects
-main :	main.o $(OBJECTS)
-	$(CPP) -o main main.o $(OBJECTS) $(LFLAGS) 
+main_host :	main.o $(OBJECTS)
+	$(CPP) -o main_host main.o $(OBJECTS) $(LFLAGS) 
 
 # Rule that tells make how to turn a .cu file into a .o
 %.o: %.cu
@@ -38,4 +38,4 @@ clean :
 veryclean :
 	rm -f *.o
 	rm -f core core.*
-	rm -f main
+	rm -f main_host

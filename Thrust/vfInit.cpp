@@ -24,11 +24,19 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void vfInit(const thrust::device_vector<REAL>& Z,
+void vfInit(const parameters& param, const thrust::device_vector<REAL>& Z,
 	    thrust::device_vector<REAL>& V)
 { 
 
   int ix,jx;
+
+  // basic parameters
+  const int nk = param.nk;
+  const int nz = param.nz;
+  const REAL alpha = param.alpha;
+  const REAL beta = param.beta;
+  const REAL delta = param.delta;
+  const REAL eta = param.eta;
 
   // initialize
   REAL Kj;

@@ -30,10 +30,17 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void ar1(const REAL& lambda, thrust::device_vector<REAL>& Z,
+void ar1(const parameters& param, thrust::device_vector<REAL>& Z,
 	 thrust::device_vector<REAL>& P)
  {
   int ix,jx;
+
+  // basic parameters
+  const int nz = param.nz;
+  const REAL mu = param.mu;
+  const REAL rho = param.rho;
+  const REAL sigma = param.sigma;
+  const REAL lambda = param.lambda;
 
   // grid for TFP
   const REAL sigma_z = sigma/pow(1-pow(rho,2),0.5);

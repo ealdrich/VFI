@@ -77,16 +77,16 @@ int main()
     //cout << "Iteration: " << count << ", Max Value Function Diff: " << diff << endl;
   }
 
+  // Compute solution time
   REAL toc = curr_second();
   REAL solTime  = toc - tic;
-  cout << endl;
-  cout << "Solution Time: " << solTime << endl;
-  cout << endl;
 
   // write to file (column major)
-  ofstream fileValue, filePolicy;
+  ofstream fileSolTime, fileValue, filePolicy;
+  fileSolTime.open("solutionTime.dat");
   fileValue.open("valueFunc.dat");
   filePolicy.open("policyFunc.dat");
+  fileSolTime << solTime << endl;
   fileValue << nk << endl;
   fileValue << nz << endl;
   filePolicy << nk << endl;
@@ -97,6 +97,7 @@ int main()
       filePolicy << G(i,j) << endl;
     }
   }  
+  fileSolTime.close();
   fileValue.close();
   filePolicy.close();
 

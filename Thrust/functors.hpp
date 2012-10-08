@@ -47,14 +47,7 @@ template <typename T>
 struct vfStep
 {
   // Attributes
-  const int nk; ///< Number of values in capital grid.
-  const int nz; ///< Number of values in AR1 (TFP) grid.
-  const T eta; ///< Coefficient of relative risk aversion.
-  const T beta; ///< Time discount factor.
-  const T alpha; ///< Capital share in production function.
-  const T delta; ///< Depreciation rate.
-  const char maxtype; ///< Flag to indicate maximization method.
-  const bool howard; ///< Flag to indicate use of Howard improvement.
+  const parameters params; ///< Object containing parameters.
   const T* K; ///< Pointer to capital grid.
   const T* Z; ///< Pointer to AR1 (TFP) grid.
   const T* P; ///< Pointer to transition matrix.
@@ -63,11 +56,8 @@ struct vfStep
   T* G; ///< Pointer to current iteration of the capital policy function.
 
   /// Constructor
-  vfStep(int _nk, int _nz, T _eta, T _beta, T _alpha, T _delta, char _maxtype,
-	 bool _howard, T* _K, T* _Z, T* _P, T* _V0, T* _V, T* _G)
-    : nk(_nk), nz(_nz), eta(_eta), beta(_beta), alpha(_alpha), delta(_delta),
-      maxtype(_maxtype), howard(_howard), K(_K), Z(_Z), P(_P), V0(_V0), V(_V),
-      G(_G) {}
+  vfStep(parameters _params, T* _K, T* _Z, T* _P, T* _V0, T* _V, T* _G)
+    : params(_params), K(_K), Z(_Z), P(_P), V0(_V0), V(_V), G(_G) {}
 
   /// Kernel to update the value function.
   /// @param hx index of V0 (stored as a flat array).
@@ -76,6 +66,16 @@ struct vfStep
   void operator()(const int& hx) const 
   {
 
+    // Basic parameters
+    int nk = params.nk;
+    int nz = params.nz;
+    REAL eta = params.eta;
+    REAL beta = params.beta;
+    REAL alpha = params.alpha;
+    REAL delta = params.delta;
+    REAL maxtype = params.maxtype;
+    REAL howard = params.howard;
+    
     // Compute the row and column IDs
     int ix = hx%nk;
     int jx = (hx-ix)/nk;
