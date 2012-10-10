@@ -51,6 +51,12 @@ int main()
   int i, j, l;
   double tic = curr_second(); // Start time
 
+  // Load parameters
+  parameters params;
+  params.load("../parameters.txt");
+  int nk = params.nk;
+  int nz = params.nz;
+
   // allocate variables in host memory
   VectorXR K(nk);
   VectorXR Z(nz);
@@ -60,22 +66,23 @@ int main()
   MatrixXi G(nk, nz);
 
   // compute TFP grid, capital grid and initial VF
-  REAL lambda = 3;
-  ar1(lambda, Z, P);
-  kGrid(Z, K);
-  vfInit(Z, V0);
+  ar1(params, Z, P);
+  kGrid(params, Z, K);
+  vfInit(params, Z, V0);
 
   // iterate
   int count = 0;
   bool how = false;
-  while(fabs(diff) > tol){
-    if(count < 3 | count % howard == 0) how = false; else how = true;
-    vfStep(how, K, Z, P, V0, V, G);
+  while(fabs(diff) > params.tol){
+    if(count < 3 | count % params.howard == 0) how = false; else how = true;
+    vfStep(params, how, K, Z, P, V0, V, G);
     diff = (V-V0).array().abs().maxCoeff();
     V0 = V;
     ++count;
     //cout << "Iteration: " << count << ", Max Value Function Diff: " << diff << endl;
   }
+
+  cout << V0.topRows(10) << endl;
 
   // Compute solution time
   REAL toc = curr_second();

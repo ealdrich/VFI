@@ -1,9 +1,7 @@
 #include "global.h"
 #include <math.h>
-#include <iostream>
 #include <Eigen/Dense>
 
-using namespace std;
 using namespace Eigen;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -34,9 +32,16 @@ using namespace Eigen;
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void ar1(const REAL& lambda, VectorXR& Z, MatrixXR& P)
+void ar1(const parameters& param, VectorXR& Z, MatrixXR& P)
 {
-  int i,j;
+  int ix,jx;
+
+  // basic parameters
+  const int nz = param.nz;
+  const REAL mu = param.mu;
+  const REAL rho = param.rho;
+  const REAL sigma = param.sigma;
+  const REAL lambda = param.lambda;
 
   // grid for TFP
   const REAL sigma_z = sigma/pow(1-pow(rho,2),0.5);
@@ -47,15 +52,15 @@ void ar1(const REAL& lambda, VectorXR& Z, MatrixXR& P)
 
   // transition matrix
   REAL normarg1, normarg2;
-  const REAL zstep = Z[1] - Z[0];
+  const REAL zstep = (zmax-zmin)/(nz-1);
   VectorXR ones = VectorXR::Constant(nz,1);
-  for(i = 0 ; i < nz ; ++i){
-    normarg1 = (zmin - mu - rho*log(Z[i]))/sigma + 0.5*zstep/sigma;
-    P(i,0) = 0.5 + 0.5*erf(normarg1/pow(2,0.5));
-    for(j = 1 ; j < (nz-1) ; ++j){
-      normarg1 = (log(Z[j]) - mu - rho*log(Z[i]))/sigma + 0.5*zstep/sigma;
-      normarg2 = (log(Z[j]) - mu - rho*log(Z[i]))/sigma - 0.5*zstep/sigma;
-      P(i,j) = 0.5*erf(normarg1/pow(2,0.5)) - 0.5*erf(normarg2/pow(2,0.5));
+  for(ix = 0 ; ix < nz ; ++ix){
+    normarg1 = (zmin - mu - rho*log(Z[ix]))/sigma + 0.5*zstep/sigma;
+    P(ix,0) = 0.5 + 0.5*erf(normarg1/pow(2,0.5));
+    for(jx = 1 ; jx < (nz-1) ; ++jx){
+      normarg1 = (log(Z[jx]) - mu - rho*log(Z[ix]))/sigma + 0.5*zstep/sigma;
+      normarg2 = (log(Z[jx]) - mu - rho*log(Z[ix]))/sigma - 0.5*zstep/sigma;
+      P(ix,jx) = 0.5*erf(normarg1/pow(2,0.5)) - 0.5*erf(normarg2/pow(2,0.5));
     }
     P.col(nz-1) = ones - P.leftCols(nz-1).rowwise().sum();
   }

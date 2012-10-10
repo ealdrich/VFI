@@ -61,7 +61,7 @@ int main()
   int ix, jx;
   REAL diff = 1.0;
 
-  // Read parameters
+  // Load parameters
   parameters params;
   params.load("../parameters.txt");
   int nk = params.nk;
@@ -90,7 +90,7 @@ int main()
   while(fabs(diff) > params.tol){
     if(count < 3 | count % params.howard == 0) how = false; else how = true;
     thrust::for_each(seq_vec.begin(), seq_vec.end(),
-		     vfStep<REAL>(params,
+		     vfStep<REAL>(params, how,
 				  raw_pointer_cast(&K[0]), raw_pointer_cast(&Z[0]),
 				  raw_pointer_cast(&P[0]), raw_pointer_cast(&V0[0]),
 				  raw_pointer_cast(&V[0]), raw_pointer_cast(&G[0])));
@@ -101,6 +101,8 @@ int main()
     ++count;
     //cout << "Iteration: " << count << ", Diff: " << diff << endl;
   }
+
+  printMatrix<REAL>(1, nk, nz, V0, 10, nz, 6);
 
   // Compute solution time
   REAL toc = curr_second();

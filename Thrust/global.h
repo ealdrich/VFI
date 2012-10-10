@@ -19,7 +19,7 @@ class parameters{
   REAL eta, beta, alpha, delta, mu, rho, sigma, lambda, tol;
   int nk, nz, howard;
   char maxtype;
-  void load(char*);
+  void load(const char*);
 };
 
 // Function declarations

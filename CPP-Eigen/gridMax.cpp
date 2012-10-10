@@ -1,7 +1,9 @@
 #include "global.h"
 #include <Eigen/Dense>
 #include <math.h>
+#include <iostream>
 
+using namespace std;
 using namespace Eigen;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -34,7 +36,8 @@ using namespace Eigen;
 ///
 //////////////////////////////////////////////////////////////////////////////
 void gridMax(const int& klo, const int& nksub, const REAL& ydepK,
-		const VectorXR& K, const VectorXR& Exp, REAL& V, int& G)
+	     const REAL eta, const REAL beta, const VectorXR& K,
+	     const VectorXR& Exp, REAL& V, int& G)
 {
   REAL w = pow(ydepK-K(klo),1-eta)/(1-eta) + beta*Exp(0);
   REAL wmax = w;

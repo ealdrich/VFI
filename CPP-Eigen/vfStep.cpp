@@ -46,10 +46,19 @@ using namespace Eigen;
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void vfStep(const bool& howard, const VectorXR& K, const VectorXR& Z,
-	    const MatrixXR& P, const MatrixXR& V0, MatrixXR& V,
-	    MatrixXi& G)
+void vfStep(const parameters& param, const bool& howard, const VectorXR& K,
+	    const VectorXR& Z, const MatrixXR& P, const MatrixXR& V0,
+	    MatrixXR& V, MatrixXi& G)
 {
+
+  // Basic parameters
+  int nk = param.nk;
+  int nz = param.nz;
+  REAL eta = param.eta;
+  REAL beta = param.beta;
+  REAL alpha = param.alpha;
+  REAL delta = param.delta;
+  char maxtype = param.maxtype;
 
   // output and depreciated capital
   MatrixXR ydepK = (K.array().pow(alpha)).matrix()*Z.transpose();
@@ -79,16 +88,10 @@ void vfStep(const bool& howard, const VectorXR& K, const VectorXR& Z,
 	Exp = V0.block(klo, 0, nksub, nz)*P.row(j).transpose();
 
 	// maximization
-	if(eigenMax){
-	  w = (((ydepK(i,j)*VectorXR::Constant(nksub,1) - K.segment(klo, nksub)).array().pow(1-eta))/(1-eta)).matrix() + beta*Exp;
-	  V(i,j) = w.maxCoeff(&indMax);
-	  G(i,j) = indMax+klo;
-	} else {
-	  if(maxtype == 'g'){
-	    gridMax(klo, nksub, ydepK(i,j), K, Exp, V(i,j), G(i,j));
-	  } else if (maxtype == 'b') {
-	    binaryMax(klo, nksub, ydepK(i,j), K, Exp, V(i,j), G(i,j));
-	  }
+	if(maxtype == 'g'){
+	  gridMax(klo, nksub, ydepK(i,j), eta, beta, K, Exp, V(i,j), G(i,j));
+	} else if (maxtype == 'b') {
+	  binaryMax(klo, nksub, ydepK(i,j), eta, beta, K, Exp, V(i,j), G(i,j));
 	}
 
       // iterate on the policy function on non-howard steps

@@ -41,7 +41,8 @@ using namespace Eigen;
 ///
 //////////////////////////////////////////////////////////////////////////////
 void binaryMax(const int& klo, const int& nksub, const REAL& ydepK,
-	       const VectorXR& K, const VectorXR& Exp, REAL& V, int& G)
+	       const REAL eta, const REAL beta, const VectorXR& K,
+	       const VectorXR& Exp, REAL& V, int& G)
 {
 
   // binary search to find the vf max over K'

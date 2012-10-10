@@ -28,14 +28,22 @@ using namespace Eigen;
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void vfInit(const VectorXR& Z, MatrixXR& V)
+void vfInit(const parameters& param, const VectorXR& Z, MatrixXR& V)
 { 
 
-  int i;
+  int ix;
+
+  // basic parameters
+  const int nk = param.nk;
+  const int nz = param.nz;
+  const REAL alpha = param.alpha;
+  const REAL beta = param.beta;
+  const REAL delta = param.delta;
+  const REAL eta = param.eta;
 
   // initialize
   ArrayXR Kj = (((alpha*Z).array().pow(-1))*((1/beta)-1+delta)).pow(1/(alpha-1));
   V.row(0) = (((Z.array()*Kj.pow(alpha) - delta*Kj).pow(1-eta))/(1-eta)).matrix();
-  for(i = 1 ; i < nk ; ++i) V.row(i) = V.row(0);
+  for(ix = 1 ; ix < nk ; ++ix) V.row(ix) = V.row(0);
 
 }
