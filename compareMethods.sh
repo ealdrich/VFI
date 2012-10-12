@@ -2,14 +2,26 @@
 
 HomeDir=~/VFI
 
-CPU="TRUE"
-GPU=1
-#MATLAB="TRUE"
+# Choose which implementations to compare
+CPU=TRUE
+GPU=TRUE
+MATLAB=FALSE
 
-if ["$GPU" -ge 1]; then
+# Run the code in each directory
+if [ $GPU = TRUE ]; then
     cd $HomeDir/Thrust
-    make veryclean; make; ./main
+    make veryclean; make; ./main; make veryclean
 fi
 
-#cd Matlab
-#matlab -nodesktop -r main -logfile main.log
+if [ $CPU = TRUE ]; then
+    cd $HomeDir/CPP
+    make veryclean; make; ./main; make veryclean
+fi
+
+if [ $MATLAB = TRUE ]; then
+    cd $HomeDir/Matlab
+    matlab -nodesktop -r main -logfile main.log
+fi
+
+# Compare the saved results
+
