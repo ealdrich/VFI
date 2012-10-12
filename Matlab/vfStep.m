@@ -34,6 +34,11 @@ function [V,G] = vfStep(param, matlabMax, howard, K, Z, P, V0, G0)
                 nksub = khi-klo+1;
         
                 % continuation value for subgrid
+		% note that this computes more values than necessary for
+		% the maximization methods, but the Matlab matrix multiply
+		% is so efficient that it is faster to compute all possible
+		% continuation values outside of the max routine rather than
+		% only the necessary values inside the routine.
                 Exp = V0(klo:khi, :)*P(j,:)';
            
                 % maximization

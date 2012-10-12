@@ -1,19 +1,15 @@
 #include "global.h"
+#include <math.h>
 
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief CUDA kernel to compute the values of an equally spaced capital
-/// grid.
+/// @brief function to compute the values of an equally spaced capital grid.
 ///
-/// @details This CUDA kernel computes an equally spaced capital grid. The
+/// @details This function computes an equally spaced capital grid. The
 /// upper and lower bounds are the deterministic steady-state values of
 /// capital at the highest and lowest values of the TFP process
 /// (respectively), scaled by 0.95 and 1.05 (respectively).
 ///
-/// @param nk length of the capital grid.
-/// @param nz length of the TFP grid.
-/// @param beta discount factor.	       
-/// @param alpha capital share of production.
 /// @param Z pointer to grid of TFP values.
 /// @param K pointer to grid of capital values.
 ///
@@ -32,10 +28,8 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-__global__ void kGrid(const parameters param, const REAL* Z, REAL* K) 
+void kGrid(const parameters& param, const REAL* Z, REAL* K)
 {
-  // thread
-  const int i = blockIdx.x * blockDim.x + threadIdx.x;
 
   // basic parameters
   const int nk = param.nk;
@@ -44,9 +38,10 @@ __global__ void kGrid(const parameters param, const REAL* Z, REAL* K)
   const REAL beta = param.beta;
   const REAL delta = param.delta;
 
-  // grid for capital
-  const REAL kmin = 0.95*pow((1/(alpha*Z[0]))*((1/beta)-1+delta),1/(alpha-1));
-  const REAL kmax = 1.05*pow((1/(alpha*Z[nz-1]))*((1/beta)-1+delta),1/(alpha-1));
-  const REAL kstep = (kmax-kmin)/(nk-1);
-  K[i] = kmin + kstep*i;
+  // initial grid for capital
+  REAL kmin = 0.95*pow((1/(alpha*Z[0]))*((1/beta)-1+delta),1/(alpha-1));
+  REAL kmax = 1.05*pow((1/(alpha*Z[nz-1]))*((1/beta)-1+delta),1/(alpha-1));
+  REAL kstep = (kmax - kmin)/(nk-1);
+  for(int ix = 0 ; ix < nk ; ++ix) K[ix] = kmin + ix*kstep;
+
 }

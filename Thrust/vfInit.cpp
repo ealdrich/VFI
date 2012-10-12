@@ -28,8 +28,6 @@ void vfInit(const parameters& param, const thrust::device_vector<REAL>& Z,
 	    thrust::device_vector<REAL>& V)
 { 
 
-  int ix,jx;
-
   // basic parameters
   const int nk = param.nk;
   const int nz = param.nz;
@@ -40,8 +38,8 @@ void vfInit(const parameters& param, const thrust::device_vector<REAL>& Z,
 
   // initialize
   REAL Kj;
-  for(ix = 0 ; ix < nk ; ++ix){
-    for(jx = 0 ; jx < nz ; ++jx){
+  for(int ix = 0 ; ix < nk ; ++ix){
+    for(int jx = 0 ; jx < nz ; ++jx){
         Kj = pow((1/(alpha*Z[jx]))*((1/beta)-1+delta),1/(alpha-1));
 	V[ix+jx*nk] = pow(Z[jx]*pow(Kj, alpha) - delta*Kj,1-eta)/(1-eta);
     }

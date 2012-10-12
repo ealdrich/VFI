@@ -79,7 +79,7 @@ int main()
   thrust::sequence(seq_vec.begin(), seq_vec.end());
   thrust::device_vector<REAL>::iterator maxIter;
 
-  // Compute TFP grid (Z)
+  // compute TFP grid, capital grid and initial VF
   ar1(params, Z, P);
   kGrid(params, Z, K);
   vfInit(params, Z, V0);

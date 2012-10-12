@@ -1,6 +1,5 @@
 #include "global.h"
 #include <math.h>
-#include <thrust/device_vector.h>
 
 //////////////////////////////////////////////////////////////////////////////
 ///
@@ -30,8 +29,7 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-void ar1(const parameters& param, thrust::device_vector<REAL>& Z,
-	 thrust::device_vector<REAL>& P)
+void ar1(const parameters& param, REAL* Z, REAL* P)
  {
 
   // basic parameters
@@ -53,13 +51,13 @@ void ar1(const parameters& param, thrust::device_vector<REAL>& Z,
   REAL normarg1, normarg2;
   for(int ix = 0 ; ix < nz ; ++ix){
     normarg1 = (zmin - mu - rho*log(Z[ix]))/sigma + 0.5*zstep/sigma;
-    P[ix] = 0.5 + 0.5*erf(normarg1/sqrt((REAL)2));
-    P[ix+nz*(nz-1)] = 1 - P[ix];
+    P[ix*nz] = 0.5 + 0.5*erf(normarg1/sqrt((REAL)2));
+    P[ix*nz+(nz-1)] = 1 - P[ix*nz];
     for(int jx = 1 ; jx < (nz-1) ; ++jx){
       normarg1 = (log(Z[jx]) - mu - rho*log(Z[ix]))/sigma + 0.5*zstep/sigma;
       normarg2 = (log(Z[jx]) - mu - rho*log(Z[ix]))/sigma - 0.5*zstep/sigma;
-      P[ix+nz*jx] = 0.5*erf(normarg1/sqrt((REAL)2)) - 0.5*erf(normarg2/sqrt((REAL)2));
-      P[ix+nz*(nz-1)] -= P[ix+nz*jx];
+      P[ix*nz+jx] = 0.5*erf(normarg1/sqrt((REAL)2)) - 0.5*erf(normarg2/sqrt((REAL)2));
+      P[ix*nz+(nz-1)] -= P[ix*nz+jx];
     }
   }
 }

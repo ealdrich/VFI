@@ -33,8 +33,6 @@ void kGrid(const parameters& param, const thrust::device_vector<REAL>& Z,
 	   thrust::device_vector<REAL>& K)
 {
 
-  int i;
-
   // basic parameters
   const int nk = param.nk;
   const int nz = param.nz;
@@ -46,6 +44,6 @@ void kGrid(const parameters& param, const thrust::device_vector<REAL>& Z,
   REAL kmin = 0.95*pow((1/(alpha*Z[0]))*((1/beta)-1+delta),1/(alpha-1));
   REAL kmax = 1.05*pow((1/(alpha*Z[nz-1]))*((1/beta)-1+delta),1/(alpha-1));
   REAL kstep = (kmax - kmin)/(nk-1);
-  for(i = 0 ; i < nk ; ++i) K[i] = kmin + i*kstep;
+  for(int ix = 0 ; ix < nk ; ++ix) K[ix] = kmin + ix*kstep;
 
 }

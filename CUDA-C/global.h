@@ -22,6 +22,9 @@ class parameters{
 
 // Function declarations
 REAL curr_second (void);
+void ar1(const parameters& param, REAL* Z, REAL* P);
+void kGrid(const parameters& param, const REAL* Z, REAL* K);
+void vfInit(const parameters& param, const REAL* Z, REAL* V);
 
 // to determine whether single or double precision is being used
 extern const float singletype;

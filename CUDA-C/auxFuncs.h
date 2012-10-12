@@ -47,7 +47,7 @@
 //////////////////////////////////////////////////////////////////////////////
 template<class T>
 void printMatrix(const bool colMaj, const int M, const int N,
-		 const thrust::device_vector<T>& X, const int printRows,
+		 const REAL* X, const int printRows,
 		 const int printCols, const int digits)
 {
   std::cout.precision(digits);
@@ -79,8 +79,7 @@ void printMatrix(const bool colMaj, const int M, const int N,
 ///
 //////////////////////////////////////////////////////////////////////////////
 template<class T>
-void printVector(const int N, const thrust::device_vector<T>& X,
-		 const int digits)
+void printVector(const int N, const REAL* X, const int digits)
 {
   std::cout.precision(digits);
   for(int ix = 0 ; ix < N ; ++ix){

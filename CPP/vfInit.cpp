@@ -31,8 +31,6 @@ using namespace Eigen;
 void vfInit(const parameters& param, const VectorXR& Z, MatrixXR& V)
 { 
 
-  int ix;
-
   // basic parameters
   const int nk = param.nk;
   const REAL alpha = param.alpha;
@@ -43,6 +41,6 @@ void vfInit(const parameters& param, const VectorXR& Z, MatrixXR& V)
   // initialize
   ArrayXR Kj = (((alpha*Z).array().pow(-1))*((1/beta)-1+delta)).pow(1/(alpha-1));
   V.row(0) = (((Z.array()*Kj.pow(alpha) - delta*Kj).pow(1-eta))/(1-eta)).matrix();
-  for(ix = 1 ; ix < nk ; ++ix) V.row(ix) = V.row(0);
+  for(int ix = 1 ; ix < nk ; ++ix) V.row(ix) = V.row(0);
 
 }

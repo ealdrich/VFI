@@ -1,7 +1,7 @@
 #!/bin/sh
 
-#HomeDir=~/VFI
-HomeDir=~/Dropbox/Academics/Research/Duke/GPU/CUDA/Code/VFI/vfi
+HomeDir=~/VFI
+#HomeDir=~/Dropbox/Academics/Research/Duke/GPU/CUDA/Code/VFI/vfi
 
 # Run baseline code
 cd $HomeDir/$1
@@ -26,18 +26,18 @@ for method in "${@:2}"
 do
     cd $HomeDir/$method
     if [ $method = Matlab ]; then
-    echo
-    echo =================================================
-    echo Running $method Comparison
-    echo =================================================
-    echo
+	echo
+	echo =================================================
+	echo Running $method Comparison
+	echo =================================================
+	echo
 	matlab -nosplash -nodisplay -r "main; exit"
     else
-    echo
-    echo =================================================
-    echo Running $method Comparison
-    echo =================================================
-    echo
+	echo
+	echo =================================================
+	echo Running $method Comparison
+	echo =================================================
+	echo
 	make veryclean; make; ./main; make veryclean
     fi
     cd $HomeDir
@@ -46,7 +46,9 @@ do
     echo Computing Difference between $1 and $method
     echo =================================================
     echo
-    matlab -nosplash -nodisplay -r "solutionDiff('"$1"','"$method"'); exit"
+    #matlab -nosplash -nodisplay -r "solutionDiff('"$1"','"$method"'); exit"
+    R --vanilla --slave --args $1 $method <solutionDiff.R> Rout.log
+    rm Rout.log
 done
 
 echo

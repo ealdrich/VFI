@@ -16,7 +16,7 @@ LFLAGS += -lcuda -lcudart -lcublas -lgslcblas -L$(LCUDA)
 CPPFLAGS = -O1 -g -c -I$(ICUDA)
 
 # List of all the objects you need
-OBJECTS  = parameters.o timer.o
+OBJECTS  = ar1.o kGrid.o vfInit.o parameters.o timer.o
 
 # Rule that tells make how to make the program from the objects
 main :	main.o $(OBJECTS)

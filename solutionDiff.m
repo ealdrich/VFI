@@ -1,4 +1,4 @@
-function [VError, GError] = solutionDiff(Method1, Method2)
+function solutionDiff(Method1, Method2)
     
     % Names of value and policy function files
     vDat = '/valueFunc.dat';
@@ -14,8 +14,8 @@ function [VError, GError] = solutionDiff(Method1, Method2)
     V2 = textscan(fileID, '%f');
     fclose(fileID);
 
-    % Compute value function error
-    VError = max(abs(V1{1}(3:end) - V2{1}(3:end)));
+    % Compute value function differences
+    VDiff = max(abs(V1{1}(3:end) - V2{1}(3:end)));
 
     % Import first policy function
     fileID = fopen([Method1 pDat]);
@@ -27,11 +27,11 @@ function [VError, GError] = solutionDiff(Method1, Method2)
     G2 = textscan(fileID, '%f');
     fclose(fileID);
 
-    % Compute policy function error
-    GError = max(abs(G1{1}(3:end) - G2{1}(3:end)));
+    % Compute policy function differences
+    GDiff = max(abs(G1{1}(3:end) - G2{1}(3:end)));
     
     % Write out
     fileOut = ['Errors_' Method1 '_' Method2 '.dat'];
-    dlmwrite(fileOut, [VError; GError], '');
+    dlmwrite(fileOut, [VDiff; GDiff], '');
 
 end

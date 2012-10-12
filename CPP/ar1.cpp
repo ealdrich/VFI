@@ -34,7 +34,6 @@ using namespace Eigen;
 //////////////////////////////////////////////////////////////////////////////
 void ar1(const parameters& param, VectorXR& Z, MatrixXR& P)
 {
-  int ix,jx;
 
   // basic parameters
   const int nz = param.nz;
@@ -54,10 +53,10 @@ void ar1(const parameters& param, VectorXR& Z, MatrixXR& P)
   REAL normarg1, normarg2;
   const REAL zstep = (zmax-zmin)/(nz-1);
   VectorXR ones = VectorXR::Constant(nz,1);
-  for(ix = 0 ; ix < nz ; ++ix){
+  for(int ix = 0 ; ix < nz ; ++ix){
     normarg1 = (zmin - mu - rho*log(Z[ix]))/sigma + 0.5*zstep/sigma;
     P(ix,0) = 0.5 + 0.5*erf(normarg1/pow(2,0.5));
-    for(jx = 1 ; jx < (nz-1) ; ++jx){
+    for(int jx = 1 ; jx < (nz-1) ; ++jx){
       normarg1 = (log(Z[jx]) - mu - rho*log(Z[ix]))/sigma + 0.5*zstep/sigma;
       normarg2 = (log(Z[jx]) - mu - rho*log(Z[ix]))/sigma - 0.5*zstep/sigma;
       P(ix,jx) = 0.5*erf(normarg1/pow(2,0.5)) - 0.5*erf(normarg2/pow(2,0.5));

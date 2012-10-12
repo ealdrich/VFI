@@ -1,14 +1,10 @@
 #include "global.h"
+#include <math.h>
 
 //////////////////////////////////////////////////////////////////////////////
 ///
 /// @brief CUDA kernel to initialize value function.
 ///
-/// @param nz length of the TFP grid.
-/// @param eta risk aversion parameter.
-/// @param beta discount factor.	       
-/// @param alpha capital share of production.
-/// @param delta depreciation rate of capital.
 /// @param Z pointer to grid of TFP values.
 /// @param V pointer to array of value function values.
 ///
@@ -27,13 +23,11 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-__global__ void vfInit(const parameters param, const REAL* Z, REAL* V)
+void vfInit(const parameters& param, const REAL* Z, REAL* V)
 { 
-  // thread
-  const int i = blockIdx.x * blockDim.x + threadIdx.x;
-  const int j = blockIdx.y * blockDim.y + threadIdx.y;
 
   // basic parameters
+  const int nk = param.nk;
   const int nz = param.nz;
   const REAL alpha = param.alpha;
   const REAL beta = param.beta;
@@ -41,6 +35,12 @@ __global__ void vfInit(const parameters param, const REAL* Z, REAL* V)
   const REAL eta = param.eta;
 
   // initialize
-  const REAL Kj = pow((1/(alpha*Z[j]))*((1/beta)-1+delta),1/(alpha-1));
-  V[i*nz+j] = pow(Z[j]*pow(Kj, alpha) - delta*Kj,1-eta)/(1-eta);
+  REAL Kj;
+  for(int ix = 0 ; ix < nk ; ++ix){
+    for(int jx = 0 ; jx < nz ; ++jx){
+        Kj = pow((1/(alpha*Z[jx]))*((1/beta)-1+delta),1/(alpha-1));
+	V[ix*nz+jx] = pow(Z[jx]*pow(Kj, alpha) - delta*Kj,1-eta)/(1-eta);
+    }
+  }
+
 }

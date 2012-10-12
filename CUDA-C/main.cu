@@ -1,4 +1,5 @@
 #include "global.h"
+#include "auxFuncs.h"
 #include "cublas_v2.h"
 #include <iostream>
 #include <ctime>
@@ -7,9 +8,6 @@
 
 using namespace std;
 
-#include "ar1.cu"
-#include "kGrid.cu"
-#include "vfInit.cu"
 #include "vfStep.cu"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -44,8 +42,7 @@ int main()
   int imax;
   REAL diff = 1.0;
   cublasHandle_t handle;
-  cublasStatus_t status;
-  status = cublasCreate(&handle);
+  cublasCreate(&handle);
   REAL negOne = -1.0;
   double tic = curr_second(); // Start time
 
@@ -74,17 +71,20 @@ int main()
 
   // blocking
   const int block_size = 4; ///< Block size for CUDA kernel.
-  dim3 dimBlockZ(nz, 1);
-  dim3 dimBlockK(block_size,1);
   dim3 dimBlockV(block_size, nz);
-  dim3 dimGridZ(1,1);
-  dim3 dimGridK(nk/block_size,1);
   dim3 dimGridV(nk/block_size,1);
-
+ 
   // compute TFP grid, capital grid and initial VF
-  ar1<<<dimGridZ,dimBlockZ>>>(params,Z,P);
-  kGrid<<<dimGridK,dimBlockK>>>(params,Z,K);
-  vfInit<<<dimGridV,dimBlockV>>>(params,Z,V0);
+  REAL hK[nk], hZ[nz], hP[nz*nz], hV0[nk*nz];
+  ar1(params, hZ, hP);
+  kGrid(params, hZ, hK);
+  vfInit(params, hZ, hV0);
+
+  // copy capital grid, TFP grid and transition matrix to GPU memory
+  cudaMemcpy(K, hK, sizeK, cudaMemcpyHostToDevice);
+  cudaMemcpy(Z, hZ, sizeZ, cudaMemcpyHostToDevice);
+  cudaMemcpy(P, hP, sizeP, cudaMemcpyHostToDevice);
+  cudaMemcpy(V0, hV0, sizeV, cudaMemcpyHostToDevice);
 
   // iterate on the value function
   int count = 0;
@@ -93,11 +93,11 @@ int main()
     if(count < 3 | count % params.howard == 0) how = false; else how = true;
     vfStep<<<dimGridV,dimBlockV>>>(params,how,K,Z,P,V0,V,G);
     if(typeid(realtype) == typeid(singletype)){
-      status = cublasSaxpy(handle, nk*nz, (float*)&negOne, (float*)V, 1, (float*)V0, 1);
-      status = cublasIsamax(handle, nk*nz, (float*)V0, 1, &imax);
+      cublasSaxpy(handle, nk*nz, (float*)&negOne, (float*)V, 1, (float*)V0, 1);
+      cublasIsamax(handle, nk*nz, (float*)V0, 1, &imax);
     } else if(typeid(realtype) == typeid(doubletype)){
-      status = cublasDaxpy(handle, nk*nz, (double*)&negOne, (double*)V, 1, (double*)V0, 1);
-      status = cublasIdamax(handle, nk*nz, (double*)V0, 1, &imax);
+      cublasDaxpy(handle, nk*nz, (double*)&negOne, (double*)V, 1, (double*)V0, 1);
+      cublasIdamax(handle, nk*nz, (double*)V0, 1, &imax);
     }
     cudaMemcpy(&diff, V0+imax, sizeof(REAL), cudaMemcpyDeviceToHost);
     Vtemp = V0;
