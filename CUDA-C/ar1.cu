@@ -32,13 +32,19 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-__global__ void ar1(const int nz, const REAL lambda, const REAL mu,
-		    const REAL sigma, const REAL rho, REAL* Z, REAL* P)
+__global__ void ar1(const parameters param, REAL* Z, REAL* P)
 { 
 
   // thread
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
   int j;
+
+  // basic parameters
+  const int nz = param.nz;
+  const REAL mu = param.mu;
+  const REAL rho = param.rho;
+  const REAL sigma = param.sigma;
+  const REAL lambda = param.lambda;
 
   // grid for TFP
   const REAL sigma_z = sigma/pow(1-pow(rho,2), 0.5);

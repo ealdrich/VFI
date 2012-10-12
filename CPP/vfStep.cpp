@@ -52,13 +52,13 @@ void vfStep(const parameters& param, const bool& howard, const VectorXR& K,
 {
 
   // Basic parameters
-  int nk = param.nk;
-  int nz = param.nz;
-  REAL eta = param.eta;
-  REAL beta = param.beta;
-  REAL alpha = param.alpha;
-  REAL delta = param.delta;
-  char maxtype = param.maxtype;
+  const int nk = param.nk;
+  const int nz = param.nz;
+  const REAL eta = param.eta;
+  const REAL beta = param.beta;
+  const REAL alpha = param.alpha;
+  const REAL delta = param.delta;
+  const char maxtype = param.maxtype;
 
   // output and depreciated capital
   MatrixXR ydepK = (K.array().pow(alpha)).matrix()*Z.transpose();

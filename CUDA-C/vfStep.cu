@@ -49,15 +49,23 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-__global__ void vfStep(const int nk, const int nz, const REAL eta,
-		       const REAL beta, const REAL alpha, const REAL delta,
-		       const char maxtype, const bool howard, const REAL* K,
-		       const REAL* Z, const REAL* P, const REAL* V0, REAL* V,
-		       REAL* G) 
+__global__ void vfStep(const parameters param, const bool howard,
+		       const REAL* K, const REAL* Z, const REAL* P,
+		       const REAL* V0, REAL* V, REAL* G) 
 {
   // thread
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
   const int j = blockIdx.y * blockDim.y + threadIdx.y;
+
+
+  // Basic parameters
+  const int nk = param.nk;
+  const int nz = param.nz;
+  const REAL eta = param.eta;
+  const REAL beta = param.beta;
+  const REAL alpha = param.alpha;
+  const REAL delta = param.delta;
+  const char maxtype = param.maxtype;
 
   // output and depreciated capital
   const REAL ydepK = Z[j]*pow(K[i],alpha) + (1-delta)*K[i];

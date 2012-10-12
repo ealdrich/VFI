@@ -32,12 +32,17 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-__global__ void kGrid(const int nk, const int nz, const REAL beta,
-		      const REAL alpha, const REAL delta, const REAL* Z,
-		      REAL* K) 
+__global__ void kGrid(const parameters param, const REAL* Z, REAL* K) 
 {
   // thread
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+  // basic parameters
+  const int nk = param.nk;
+  const int nz = param.nz;
+  const REAL alpha = param.alpha;
+  const REAL beta = param.beta;
+  const REAL delta = param.delta;
 
   // grid for capital
   const REAL kmin = 0.95*pow((1/(alpha*Z[0]))*((1/beta)-1+delta),1/(alpha-1));

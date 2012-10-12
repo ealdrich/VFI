@@ -11,24 +11,17 @@
 
 typedef double REAL;
 
-// economic parameters
-extern const REAL eta;
-extern const REAL beta;
-extern const REAL alpha;
-extern const REAL delta;
-extern const REAL mu;
-extern const REAL rho;
-extern const REAL sigma;
+// Class for storing economic and computational parameters of the model
+class parameters{
+ public:
+  REAL eta, beta, alpha, delta, mu, rho, sigma, lambda, tol;
+  int nk, nz, howard;
+  char maxtype;
+  void load(const char*);
+};
 
-// computational parameters
-extern const int block_size;
-extern const int nk;
-extern const int nz;
-extern const REAL tol;
-
-// maximization parameters
-extern const char maxtype;
-extern const int howard;
+// Function declarations
+REAL curr_second (void);
 
 // to determine whether single or double precision is being used
 extern const float singletype;

@@ -35,7 +35,6 @@ void vfInit(const parameters& param, const VectorXR& Z, MatrixXR& V)
 
   // basic parameters
   const int nk = param.nk;
-  const int nz = param.nz;
   const REAL alpha = param.alpha;
   const REAL beta = param.beta;
   const REAL delta = param.delta;

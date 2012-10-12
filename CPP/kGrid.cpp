@@ -40,7 +40,6 @@ void kGrid(const parameters& param, const VectorXR& Z, VectorXR& K)
   const REAL alpha = param.alpha;
   const REAL beta = param.beta;
   const REAL delta = param.delta;
-  const REAL eta = param.eta;
 
   // initial grid for capital
   REAL kmin = 0.95*pow((1/(alpha*Z[0]))*((1/beta)-1+delta),1/(alpha-1));

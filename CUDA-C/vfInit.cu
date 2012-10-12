@@ -27,13 +27,18 @@
 ///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
-__global__ void vfInit(const int nz,  const REAL eta, const REAL beta,
-		       const REAL alpha, const REAL delta, const REAL* Z,
-		       REAL* V)
+__global__ void vfInit(const parameters param, const REAL* Z, REAL* V)
 { 
   // thread
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
   const int j = blockIdx.y * blockDim.y + threadIdx.y;
+
+  // basic parameters
+  const int nz = param.nz;
+  const REAL alpha = param.alpha;
+  const REAL beta = param.beta;
+  const REAL delta = param.delta;
+  const REAL eta = param.eta;
 
   // initialize
   const REAL Kj = pow((1/(alpha*Z[j]))*((1/beta)-1+delta),1/(alpha-1));

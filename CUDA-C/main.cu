@@ -47,6 +47,13 @@ int main()
   cublasStatus_t status;
   status = cublasCreate(&handle);
   REAL negOne = -1.0;
+  double tic = curr_second(); // Start time
+
+  // Load parameters
+  parameters params;
+  params.load("../parameters.txt");
+  int nk = params.nk;
+  int nz = params.nz;
 
   // pointers to variables in device memory
   REAL *K, *Z, *P, *V0, *V, *G, *Vtemp;
@@ -57,7 +64,6 @@ int main()
   size_t sizeP = nz*nz*sizeof(REAL);
   size_t sizeV = nk*nz*sizeof(REAL);
   size_t sizeG = nk*nz*sizeof(REAL);
-  clock_t start = clock();
   cudaMalloc((void**)&K, sizeK);
   cudaMalloc((void**)&Z, sizeZ);
   cudaMalloc((void**)&P, sizeP);
@@ -65,9 +71,9 @@ int main()
   cudaMalloc((void**)&Vtemp, sizeV);
   cudaMalloc((void**)&V, sizeV);
   cudaMalloc((void**)&G, sizeG);
-  cout << "GPU Memory Allocation: " << (clock() - start)/(REAL)CLOCKS_PER_SEC << endl;
 
   // blocking
+  const int block_size = 4; ///< Block size for CUDA kernel.
   dim3 dimBlockZ(nz, 1);
   dim3 dimBlockK(block_size,1);
   dim3 dimBlockV(block_size, nz);
@@ -76,18 +82,16 @@ int main()
   dim3 dimGridV(nk/block_size,1);
 
   // compute TFP grid, capital grid and initial VF
-  REAL lambda = 3;
-  ar1<<<dimGridZ,dimBlockZ>>>(nz,lambda,mu,sigma,rho,Z,P);
-  kGrid<<<dimGridK,dimBlockK>>>(nk,nz,beta,alpha,delta,Z,K);
-  vfInit<<<dimGridV,dimBlockV>>>(nz,eta,beta,alpha,delta,Z,V0);
+  ar1<<<dimGridZ,dimBlockZ>>>(params,Z,P);
+  kGrid<<<dimGridK,dimBlockK>>>(params,Z,K);
+  vfInit<<<dimGridV,dimBlockV>>>(params,Z,V0);
 
   // iterate on the value function
   int count = 0;
   bool how = false;
-  start = clock();
-  while(fabs(diff) > tol){
-    if(count < 3 | count % howard == 0) how = false; else how = true;
-    vfStep<<<dimGridV,dimBlockV>>>(nk,nz,eta,beta,alpha,delta,maxtype,how,K,Z,P,V0,V,G);
+  while(fabs(diff) > params.tol){
+    if(count < 3 | count % params.howard == 0) how = false; else how = true;
+    vfStep<<<dimGridV,dimBlockV>>>(params,how,K,Z,P,V0,V,G);
     if(typeid(realtype) == typeid(singletype)){
       status = cublasSaxpy(handle, nk*nz, (float*)&negOne, (float*)V, 1, (float*)V0, 1);
       status = cublasIsamax(handle, nk*nz, (float*)V0, 1, &imax);
@@ -101,22 +105,17 @@ int main()
     V = Vtemp;
     ++count;
   }
-  cout << "GPU Solve Time: " << (clock() - start)/(REAL)CLOCKS_PER_SEC << endl;
   V = V0;
   
+  // Compute solution time
+  REAL toc = curr_second();
+  REAL solTime  = toc - tic;
+
   // copy value and policy functions to host memory
   REAL* hV = new REAL[nk*nz];
   REAL* hG = new REAL[nk*nz];
   cudaMemcpy(hV, V, sizeV, cudaMemcpyDeviceToHost);
   cudaMemcpy(hG, G, sizeG, cudaMemcpyDeviceToHost);
-
-  // copy state variable grids and transition matrix to host memory
-  REAL* hK = new REAL[nk];
-  REAL* hZ = new REAL[nz];
-  REAL* hP = new REAL[nz*nz];
-  cudaMemcpy(hK, K, sizeK, cudaMemcpyDeviceToHost);
-  cudaMemcpy(hZ, Z, sizeZ, cudaMemcpyDeviceToHost);
-  cudaMemcpy(hP, P, sizeP, cudaMemcpyDeviceToHost);
 
   // free variables in device memory
   cudaFree(K);
@@ -128,20 +127,23 @@ int main()
   cudaFree(G);
   cublasDestroy(handle);
 
-  // write to file (column major)
-  ofstream fileValue, filePolicy;
+  // write to file (row major)
+  ofstream fileSolTime, fileValue, filePolicy;
+  fileSolTime.open("solutionTime.dat");
   fileValue.open("valueFunc.dat");
   filePolicy.open("policyFunc.dat");
+  fileSolTime << solTime << endl;
   fileValue << nk << endl;
   fileValue << nz << endl;
   filePolicy << nk << endl;
   filePolicy << nz << endl;
-  for(int j = 0 ; j < nz ; ++j){
-    for(int i = 0 ; i < nk ; ++i){
-      fileValue << hV[i*nz+j] << endl;
-      filePolicy << hG[i*nz+j] << endl;
+  for(int jx = 0 ; jx < nz ; ++jx){
+    for(int ix = 0 ; ix < nk ; ++ix){
+      fileValue << hV[ix*nz+jx] << endl;
+      filePolicy << hG[ix*nz+jx] << endl;
     }
   }  
+  fileSolTime.close();
   fileValue.close();
   filePolicy.close();
 

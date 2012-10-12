@@ -68,13 +68,13 @@ struct vfStep
   {
 
     // Basic parameters
-    int nk = params.nk;
-    int nz = params.nz;
-    REAL eta = params.eta;
-    REAL beta = params.beta;
-    REAL alpha = params.alpha;
-    REAL delta = params.delta;
-    char maxtype = params.maxtype;
+    const int nk = params.nk;
+    const int nz = params.nz;
+    const REAL eta = params.eta;
+    const REAL beta = params.beta;
+    const REAL alpha = params.alpha;
+    const REAL delta = params.delta;
+    const char maxtype = params.maxtype;
     
     // Compute the row and column IDs
     int ix = hx%nk;

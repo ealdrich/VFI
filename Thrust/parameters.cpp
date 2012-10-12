@@ -1,4 +1,6 @@
 #include "global.h"
+#include <stdlib.h>
+#include <vector>
 #include <fstream>
 
 using namespace std;
