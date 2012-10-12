@@ -37,5 +37,3 @@ solTime = toc;
 dlmwrite('solutionTime.dat', solTime, '');
 dlmwrite('valueFunc.dat', [params.nk; params.nz; V(:)], '');
 dlmwrite('policyFunc.dat', [params.nk; params.nz; G(:)], '');
-
-exit

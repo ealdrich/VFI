@@ -82,8 +82,6 @@ int main()
     //cout << "Iteration: " << count << ", Max Value Function Diff: " << diff << endl;
   }
 
-  cout << V0.topRows(10) << endl;
-
   // Compute solution time
   REAL toc = curr_second();
   REAL solTime  = toc - tic;

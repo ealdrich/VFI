@@ -102,8 +102,6 @@ int main()
     //cout << "Iteration: " << count << ", Diff: " << diff << endl;
   }
 
-  printMatrix<REAL>(1, nk, nz, V0, 10, nz, 6);
-
   // Compute solution time
   REAL toc = curr_second();
   REAL solTime  = toc - tic;

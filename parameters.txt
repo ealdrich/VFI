@@ -6,7 +6,7 @@
 0.95,  ///< TFP persistence.
 0.005, ///< TFP volatility.
 3,     ///< Number of standard deviations for AR1 approximation
-1024,  ///< Number of values in capital grid.
+16,  ///< Number of values in capital grid.
 4,     ///< Number of values TFP grid.
 1e-10, ///< Tolerance for convergence.
 b,     ///< @brief Maximization method - choices are 'g' (grid) and 'b' (binary search).
