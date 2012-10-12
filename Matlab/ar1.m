@@ -1,4 +1,11 @@
-function [Z, P] = ar1(rho, nz, mu, sigma, lambda)
+function [Z, P] = ar1(param)
+
+    % basic parameters
+    nz = param.nz;
+    mu = param.mu;
+    rho = param.rho;
+    sigma = param.sigma;
+    lambda = param.lambda;
 
     % grid for TFP
     sigma_z = sigma/sqrt(1-rho^2);

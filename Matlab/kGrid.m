@@ -1,4 +1,12 @@
-function K = kGrid(alpha, beta, delta, nk, Z)
+function K = kGrid(param, Z)
+
+    % basic parameters
+    nk = param.nk;
+    nz = param.nz;
+    alpha = param.alpha;
+    beta = param.beta;
+    delta = param.delta;
+    eta = param.eta;
 
     % initial grid for capital
     kmin = 0.95*(((1/(alpha*Z(1)))*((1/beta)-1+delta))^(1/(alpha-1)));

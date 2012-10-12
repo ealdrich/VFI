@@ -1,4 +1,12 @@
-function V = vfInit(alpha, beta, delta, eta, nk, Z)
+function V = vfInit(param, Z)
+
+    % basic parameters
+    nk = param.nk;
+    nz = param.nz;
+    alpha = param.alpha;
+    beta = param.beta;
+    delta = param.delta;
+    eta = param.eta;
 
     % initialize
     Kj = ((1./(alpha*Z))*((1/beta)-1+delta)).^(1/(alpha-1));

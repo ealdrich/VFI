@@ -18,14 +18,14 @@ function [V,G] = binaryMax(beta, eta, klo, nksub, ydepK, K, Exp)
         end
         % when the grid is reduced to three values, find the max
         if(w2 > w1)
-            w2 = ((ydepK-K(klo+kslo-1))^(1-eta))/(1-eta) + beta*Exp(kslo);
+            w2 = ((ydepK-K(klo+kshi-1))^(1-eta))/(1-eta) + beta*Exp(kshi);
             if(w2 > w1)
                 V = w2; G = klo+kslo;
             else
                 V = w1; G = klo+kshi-1;
             end
         else
-            w2 = ((ydepK-K(klo+kslo))^(1-eta))/(1-eta) + beta*Exp(1+kslo);
+            w2 = ((ydepK-K(klo+kslo-1))^(1-eta))/(1-eta) + beta*Exp(kslo);
             if(w2 > w1)
                 V = w2; G = klo+kslo-1;
             else

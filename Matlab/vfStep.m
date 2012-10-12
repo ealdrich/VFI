@@ -1,8 +1,14 @@
-function [V,G] = vfStep(alpha, beta, delta, eta, matlabMax, maxtype, howard, K, Z, P, V0, G0)
+function [V,G] = vfStep(param, matlabMax, howard, K, Z, P, V0, G0)
 
-    nk = size(K,2);
-    nz = size(Z,2);
-
+    % Basic parameters
+    nk = param.nk;
+    nz = param.nz;
+    eta = param.eta;
+    beta = param.beta;
+    alpha = param.alpha;
+    delta = param.delta;
+    maxtype = param.maxtype;
+    
     % output and depreciated capital
     ydepK = (K.^alpha)'*Z + (1-delta)*K(ones(1,nz),:)';
 
