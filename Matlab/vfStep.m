@@ -1,3 +1,51 @@
+%=============================================================================
+%>
+%> @file vfStep.m
+%>
+%> @brief File containing main iterative step of the VFI problem.
+%>
+%> @author Eric M. Aldrich \n
+%>         ealdrich@ucsc.edu
+%>
+%> @version 1.0
+%>
+%> @date 23 Oct 2012
+%>
+%> @copyright Copyright Eric M. Aldrich 2012 \n
+%>            Distributed under the Boost Software License, Version 1.0
+%>            (See accompanying file LICENSE_1_0.txt or copy at \n
+%>            http://www.boost.org/LICENSE_1_0.txt)
+%>
+%=============================================================================
+
+%=============================================================================
+%>
+%> @brief Function to update value function.
+%>
+%> @details This function performs one iteration of the value function
+%> iteration algorithm, using V0 as the current value function and either
+%> maximizing the LHS of the Bellman if @link howard @endlink = false or
+%> using the concurrent policy function as the argmax if
+%> @link howard @endlink = true. Maximization is performed by either
+%> @link gridMax @endlink or @link binaryMax @endlink.
+%>
+%> @param [in] param Object of class parameters.
+%> @param [in] matlabMax Boolean which determines the Matlab max function is
+%> used for maximization instead of @link gridMax @endlink or
+%> @link binaryMax @endlink.
+%> @param [in] howard Indicates if the current iteration of the value
+%> function will perform a maximization (false) or if it will simply compute
+%> the new value function using the concurrent policy function (true).
+%> @param [in] K Grid of capital values.
+%> @param [in] Z Grid of TFP values.
+%> @param [in] P TFP transition matrix.
+%> @param [in] V0 Matrix storing current value function.
+%> @param [in] G0 Matrix storing current policy function.
+%>
+%> @retval V Matrix storing updated value function.
+%> @retval G Matrix storing policy function (updated if howard = false).
+%>
+%=============================================================================
 function [V,G] = vfStep(param, matlabMax, howard, K, Z, P, V0, G0)
 
     % Basic parameters
@@ -48,9 +96,9 @@ function [V,G] = vfStep(param, matlabMax, howard, K, Z, P, V0, G0)
                     G(i,j) = G(i,j)+klo-1;
                 else
                     if(maxtype == 'g')
-                        [V(i,j), G(i,j)] = gridMax(beta, eta, klo, nksub, ydepK(i,j), K, Exp);
+		      [V(i,j), G(i,j)] = gridMax(klo, nksub, ydepK(i,j), eta, beta, K, Exp);
                     elseif(maxtype == 'b')
-                        [V(i,j), G(i,j)] = binaryMax(beta, eta, klo, nksub, ydepK(i,j), K, Exp);
+		      [V(i,j), G(i,j)] = binaryMax(klo, nksub, ydepK(i,j), eta, beta, K, Exp);
                     end
                 end
             

@@ -1,27 +1,40 @@
-#include "global.h"
-
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief CUDA device function to find the index, ind, of X such that
-/// x <= X[ind]. We assume that X is increasing.
+/// @file binaryVal.cpp
 ///
-/// @param x value to search for in array X.
-/// @param nx length of array X.
-/// @param X pointer to array of data to search.
-///
-/// @returns 0 upon successful complete, 1 otherwise.
+/// @brief File containing a CUDA device function which finds the approximate
+/// location of a value in a vector with monotonically increasing values.
 ///
 /// @author Eric M. Aldrich \n
 ///         ealdrich@ucsc.edu
 ///
 /// @version 1.0
 ///
-/// @date 24 July 2012
+/// @date 23 Oct 2012
 ///
 /// @copyright Copyright Eric M. Aldrich 2012 \n
 ///            Distributed under the Boost Software License, Version 1.0
 ///            (See accompanying file LICENSE_1_0.txt or copy at \n
 ///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+
+#include "global.h"
+
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @brief CUDA device function to find the location of a value in a
+/// monotonic grid.
+///
+/// @details This function finds the first value X[ix] such that x <= X[ix],
+/// where x is a scalar value, X is a monotonic array, and ix is the index
+/// of X.
+///
+/// @param [in] x Value to search for in vector X.
+/// @param [in] nx Length of array X.
+/// @param [in] X Vector of data to search.
+///
+/// @return imax Integer ix (<= nx) such that x <= X[ix].
 ///
 //////////////////////////////////////////////////////////////////////////////
 __device__ int binaryVal(const REAL x, const int n, const REAL* X)

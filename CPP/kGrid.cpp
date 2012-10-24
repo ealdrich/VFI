@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file kGrid.cpp
+///
+/// @brief File containing function to create capital grid.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 23 Oct 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+
 #include "global.h"
 #include <math.h>
 #include <Eigen/Dense>
@@ -6,29 +26,18 @@ using namespace Eigen;
 
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief function to compute the values of an equally spaced capital grid.
+/// @brief Function to compute the values of an equally spaced capital grid.
 ///
 /// @details This function computes an equally spaced capital grid. The
 /// upper and lower bounds are the deterministic steady-state values of
 /// capital at the highest and lowest values of the TFP process
 /// (respectively), scaled by 0.95 and 1.05 (respectively).
 ///
-/// @param Z pointer to grid of TFP values.
-/// @param K pointer to grid of capital values.
+/// @param [in] param Object of class parameters.
+/// @param [in] Z Grid of TFP values.
+/// @param [out] K Grid of capital values.
 ///
 /// @returns Void.
-///
-/// @author Eric M. Aldrich \n
-///         ealdrich@ucsc.edu
-///
-/// @version 1.0
-///
-/// @date 24 July 2012
-///
-/// @copyright Copyright Eric M. Aldrich 2012 \n
-///            Distributed under the Boost Software License, Version 1.0
-///            (See accompanying file LICENSE_1_0.txt or copy at \n
-///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
 void kGrid(const parameters& param, const VectorXR& Z, VectorXR& K)

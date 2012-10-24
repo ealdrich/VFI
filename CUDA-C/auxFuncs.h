@@ -21,8 +21,6 @@
 #ifndef __FILE_AUX_FUNCS_H_SEEN__
 #define __FILE_AUX_FUNCS_H_SEEN__
 
-//#include "global.h"
-//#include <math.h>
 #include <iostream>
 #include <iomanip>
 
@@ -33,14 +31,14 @@
 /// @details This functions prints a subset of the elements of a matrix to
 /// the screen.
 ///
-/// @param colMaj boolean indicating if the matrix is stored in
+/// @param [in] colMaj Boolean indicating if the matrix is stored in
 /// column-major format.
-/// @param M number of rows in the data matrix.
-/// @param N number of columns in the data matrix.
-/// @param X Thrust device vector.
-/// @param printRows number of rows to print.
-/// @param printCols number of columns to print.
-/// @param precision number of significant digits to print.
+/// @param [in] M Number of rows in the data matrix.
+/// @param [in] N Number of columns in the data matrix.
+/// @param [in] X Array of matrix values.
+/// @param [in] printRows Number of rows to print.
+/// @param [in] printCols Number of columns to print.
+/// @param [in] precision Number of significant digits to print.
 ///
 /// @return Void.
 ///
@@ -66,14 +64,14 @@ void printMatrix(const bool colMaj, const int M, const int N,
 
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief Function to print the elements of a Thrust device vector.
+/// @brief Function to print the elements of a vector.
 ///
-/// @details This functions prints a subset of the elements of a Thrust 
-/// device vector to the screen.
+/// @details This functions prints a subset of the elements of a vector to 
+/// the screen.
 ///
-/// @param N number of elements in the data matrix.
-/// @param X Thrust device vector.
-/// @param precision number of significant digits to print.
+/// @param [in] N Number of elements in the data matrix.
+/// @param [in] X Array of vector values.
+/// @param [in] precision Number of significant digits to print.
 ///
 /// @return Void.
 ///

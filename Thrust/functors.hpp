@@ -34,13 +34,12 @@ using namespace std;
 ///
 /// @brief Functor to update the value function.
 ///
-/// @details This functor updates the value function. If @link howard @endlink
-/// is FALSE, the value and capital policy functions are updated by
-/// maximizing the Belman objective function using the current value function.
-/// Maximization is either performed by @link binary_max @endlink or
-/// @link grid_max @endlink. If @link howard @endlink is TRUE, the value
-/// function is updated without maximization, by simply iterating the Belman
-/// with the current capital policy function.
+/// @details This functor performs one iteration of the value function
+/// iteration algorithm, using V0 as the current value function and either
+/// maximizing the LHS of the Bellman if @link howard @endlink = false or
+/// using the concurrent policy function as the argmax if
+/// @link howard @endlink = true. Maximization is performed by either
+/// @link gridMax @endlink or @link binaryMax @endlink.
 ///
 //////////////////////////////////////////////////////////////////////////////
 template <typename T>
@@ -88,17 +87,17 @@ struct vfStep
       
       // impose constraints on grid for future capital
       const int klo = 0;
-      int khi = binary_val(ydepK, nk, K); // nonnegativity of C
+      int khi = binaryVal(ydepK, nk, K); // nonnegativity of C
       if(K[khi] > ydepK) khi -= 1;
       const int nksub = khi-klo+1;
 
       // maximization either via grid (g), or binary search (b)
       // if binary, turn off policy iteration (to preserve concavity)
       if(maxtype == 'g'){
-	grid_max(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
+	gridMax(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
 		 V0+klo, V+ix+jx*nk, G+ix+jx*nk);
       } else if(maxtype == 'b'){
-	binary_max(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
+	binaryMax(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
 	   V0+klo, V+ix+jx*nk, G+ix+jx*nk);
       }
 
@@ -113,21 +112,23 @@ struct vfStep
 
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief Function to find the location of a value in a monotonic grid.
+/// @brief Device function to find the location of a value in a monotonic
+/// grid.
 ///
-/// @details This function finds the first value X[ix] such that X[ix] >= x,
-/// where x is a scalar value, X is a monotonic grid, and ix is the index
+/// @details This function finds the first value X[ix] such that x <= X[ix],
+/// where x is a scalar value, X is a monotonic array, and ix is the index
 /// of X.
 ///
-/// @param x value to search for in grid X.
-/// @param n number of values in grid X.
-/// @param *X pointer to grid X.
-/// @return imax first integer (<= n) such that X[ix] >= x. 
+/// @param [in] x Value to search for in vector X.
+/// @param [in] nx Length of array X.
+/// @param [in] X Vector of data to search.
+///
+/// @return imax Integer ix (<= nx) such that x <= X[ix].
 ///
 //////////////////////////////////////////////////////////////////////////////
 template <typename T>
 __host__ __device__
-int binary_val(const T x, const int n, const T* X)
+int binaryVal(const T x, const int nx, const T* X)
 {
 
   int imax;
@@ -137,15 +138,15 @@ int binary_val(const T x, const int n, const T* X)
     imax = 0;
     return imax;
   }
-  if(x > X[n-1]){
-    imax = n-1;
+  if(x > X[nx-1]){
+    imax = nx-1;
     return imax;
   }
 
   // otherwise
   int ilo, ihi, imid;
   ilo = 0;
-  ihi = n-1;
+  ihi = nx-1;
   while((ihi-ilo) > 1){
     imid = (ilo + ihi)/2;
     if(X[imid] == x){
@@ -161,31 +162,32 @@ int binary_val(const T x, const int n, const T* X)
 
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief Function to maximize Belman objective function with naive grid
+/// @brief Device function to compute maximum of Bellman objective via grid
 /// search.
 ///
-/// @details This function computes the maximum of the Belman objective
-/// function for a given pair of state values by searching over each
-/// possible value of future capital in the grid for capital.
+/// @details This function finds the maximum and argmax of the Bellman
+/// objective function by using a naive grid search: computing the utility
+/// at each value of the grid.
 ///
-/// @param klo lower index of the capital grid to begin search.
-/// @param nksub number of points in the capital grid to include in search.
-/// @param nk number of points in the capital grid.
-/// @param nz number of points in the AR1 (TFP) grid.
-/// @param ydepK value of output plus depreciated capital.
-/// @param eta coefficient of relative risk aversion.
-/// @param beta time discount factor.
-/// @param *K pointer to capital grid.
-/// @param *P pointer to AR1 (TFP) transition matrix.
-/// @param *V0 pointer to current iterate of value function.
-/// @param *V pointer to updated value function.
-/// @param *G pointer to updated capital policy function.
-/// @return Void.
+/// @param [in] klo Lower index of the capital grid to begin search.
+/// @param [in] nksub Number of points in the capital grid to include in
+/// search.
+/// @param [in] nz Length of TFP grid.
+/// @param [in] ydepK value of output plus depreciated capital.
+/// @param [in] eta Coefficient of relative risk aversion.
+/// @param [in] beta Time discount factor.
+/// @param [in] K Grid of capital values.
+/// @param [in] P TFP transition matrix.
+/// @param [in] V0 Current value function.
+/// @param [out] V Updated value function.
+/// @param [out] G Updated policy function.
+///
+/// @returns Void.
 ///
 //////////////////////////////////////////////////////////////////////////////
 template <typename T>
 __host__ __device__
-void grid_max(const int klo, const int nksub, const int nk,
+void gridMax(const int klo, const int nksub, const int nk,
 	      const int nz, const T ydepK, const T eta,
 	      const T beta, const T* K, const T* P, const T* V0, T* V, T* G)
 {
@@ -210,30 +212,33 @@ void grid_max(const int klo, const int nksub, const int nk,
 
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief Function to maximize Belman objective function with binary search.
+/// @brief Device function to compute maximum of Bellman objective via binary
+/// search.
 ///
-/// @details This function computes the maximum of the Belman objective
-/// function for a given pair of state values by using a binary search
-/// algorithm, as outlined in Heer and Maussner (2005, p.26).
+/// @details This function finds the maximum and argmax of the Bellman
+/// objective over a specified subgrid of capital by using a binary search
+/// algorithm. The algorithm requires concavity and cannot be used with the
+/// howard improvement method.
 ///
-/// @param klo lower index of the capital grid to begin search.
-/// @param nksub number of points in the capital grid to include in search.
-/// @param nk number of points in the capital grid.
-/// @param nz number of points in the AR1 (TFP) grid.
-/// @param ydepK value of output plus depreciated capital.
-/// @param eta coefficient of relative risk aversion.
-/// @param beta time discount factor.
-/// @param *K pointer to capital grid.
-/// @param *P pointer to AR1 (TFP) transition matrix.
-/// @param *V0 pointer to current iterate of value function.
-/// @param *V pointer to updated value function.
-/// @param *G pointer to updated capital policy function.
-/// @return Void.
+/// @param [in] klo Lower index of the capital grid to begin search.
+/// @param [in] nksub Number of points in the capital grid to include in
+/// search.
+/// @param [in] nz Length of TFP grid.
+/// @param [in] ydepK value of output plus depreciated capital.
+/// @param [in] eta Coefficient of relative risk aversion.
+/// @param [in] beta Time discount factor.
+/// @param [in] K Grid of capital values.
+/// @param [in] P TFP transition matrix.
+/// @param [in] V0 Current value function.
+/// @param [out] V Updated value function.
+/// @param [out] G Updated policy function.
+///
+/// @returns Void.
 ///
 //////////////////////////////////////////////////////////////////////////////
 template <typename T>
 __host__ __device__
-void binary_max(const int klo, const int nksub, const int nk,
+void binaryMax(const int klo, const int nksub, const int nk,
 		const int nz, const T ydepK, const T eta,
 		const T beta, const T* K, const T* P,const T* V0, T* V, T* G)
 {
@@ -325,7 +330,7 @@ void binary_max(const int klo, const int nksub, const int nk,
 ///
 //////////////////////////////////////////////////////////////////////////////
 template <typename T>
-struct abs_diff
+struct absDiff
 {
 
   /// Kernel to compute the absolute difference between elements.

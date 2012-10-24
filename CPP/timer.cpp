@@ -1,16 +1,29 @@
-// ****************************************************************************
-// File: timer.cpp
-//
-// Purpose:
-//   Basic timer method
-//
-// Programmer:  Kyle Spafford
-// Creation:    November 19, 2010
-//
-// ****************************************************************************
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file timer.cpp
+///
+/// @brief File containing basic timer function.
+///
+/// @author Kyle Spafford
+///
+/// @date 19 November 2010
+///
+/// @copyright Public domain.
+///
+//////////////////////////////////////////////////////////////////////////////
 
 #include <stddef.h>
 #include <sys/time.h>
+
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @fn curr_second
+///
+/// @brief Basic timer function.
+///
+/// @return Double precision value representing time.
+///
+//////////////////////////////////////////////////////////////////////////////
 double curr_second (void)
 {
     struct timeval tv;

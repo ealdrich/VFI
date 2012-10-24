@@ -10,7 +10,7 @@ ICUDA = /usr/local/cuda/include
 LCUDA = /usr/local/cuda/lib64
 
 # Add CUDA libraries to the link line
-LFLAGS += -lcuda -lcudart -lcublas -lgslcblas -L$(LCUDA)
+LFLAGS += -lcuda -lcudart -lcublas -L$(LCUDA)
 
 # Include standard optimization flags
 CPPFLAGS = -O1 -g -c -I$(ICUDA)

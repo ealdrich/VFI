@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file vfStep.cpp
+///
+/// @brief File containing main iterative step of the VFI problem.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 23 Oct 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+
 #include "global.h"
 #include <math.h>
 #include <iostream>
@@ -10,40 +30,28 @@ using namespace Eigen;
 
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief function to update value function.
+/// @brief Function to update value function.
 ///
-/// @details  This function performs one iteration of the value function
+/// @details This function performs one iteration of the value function
 /// iteration algorithm, using V0 as the current value function and either
-/// maximizing the LHS of the Bellman if howard = false or using the 
-/// concurrent policy function as the argmax if howard = true. Monotonicity
-/// of the policy function IS NOT exploited as this creates dependencies
-/// among the GPU processors that are not parallelizable. Maximization is
-/// performed by either a grid search or binary search algorithm.
+/// maximizing the LHS of the Bellman if @link howard @endlink = false or
+/// using the concurrent policy function as the argmax if
+/// @link howard @endlink = true. Maximization is performed by either
+/// @link gridMax @endlink or @link binaryMax @endlink.
 ///
-/// @param howard indicates if the current iteration of the value function
-/// will perform a maximization (false) or if it will simply compute the
-/// new value function using the concurrent policy function (true).
-/// @param K pointer to grid of capital values.
-/// @param Z pointer to grid of TFP values.
-/// @param P pointer to TFP transition matrix.
-/// @param V0 pointer to array storing current value function.
-/// @param V pointer to array of storing updated value function.
-/// @param G pointer to array of storing policy function (updated if
-/// howard = false.
+/// @param [in] param Object of class parameters.
+/// @param [in] howard Indicates if the current iteration of the value
+/// function will perform a maximization (false) or if it will simply compute
+/// the new value function using the concurrent policy function (true).
+/// @param [in] K Grid of capital values.
+/// @param [in] Z Grid of TFP values.
+/// @param [in] P TFP transition matrix.
+/// @param [in] V0 Matrix storing current value function.
+/// @param [out] V Matrix storing updated value function.
+/// @param [in,out] G Matrix storing policy function (updated if
+/// howard = false).
 ///
 /// @returns Void.
-///
-/// @author Eric M. Aldrich \n
-///         ealdrich@ucsc.edu
-///
-/// @version 1.0
-///
-/// @date 24 July 2012
-///
-/// @copyright Copyright Eric M. Aldrich 2012 \n
-///            Distributed under the Boost Software License, Version 1.0
-///            (See accompanying file LICENSE_1_0.txt or copy at \n
-///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
 void vfStep(const parameters& param, const bool& howard, const VectorXR& K,
@@ -75,7 +83,7 @@ void vfStep(const parameters& param, const bool& howard, const VectorXR& K,
 
 	// impose constraints on grid for future capital
 	klo = 0;
-	khi = binaryVal(ydepK(i,j), nk, K); // consumption nonnegativity
+	khi = binaryVal(ydepK(i,j), K); // consumption nonnegativity
 	if(K[khi] > ydepK(i,j)) khi -= 1;
 
 	// further restrict capital grid via monotonicity (CPU only)

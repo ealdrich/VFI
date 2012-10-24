@@ -1,3 +1,24 @@
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file vfStep.cpp
+///
+/// @brief File containing CUDA kernel which performs the main iterative step
+/// of the VFI problem.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 23 Oct 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+
 #include "global.h"
 #include "binaryVal.cu"
 #include "binaryMax.cu"
@@ -7,46 +28,26 @@
 ///
 /// @brief CUDA kernel to update value function.
 ///
-/// @details  This CUDA kernel performs one iteration of the value function
+/// @details This function performs one iteration of the value function
 /// iteration algorithm, using V0 as the current value function and either
-/// maximizing the LHS of the Bellman if howard = false or using the 
-/// concurrent policy function as the argmax if howard = true. Monotonicity
-/// of the policy function IS NOT exploited as this creates dependencies
-/// among the GPU processors that are not parallelizable. Maximization is
-/// performed by either a grid search or binary search algorithm.
+/// maximizing the LHS of the Bellman if @link howard @endlink = false or
+/// using the concurrent policy function as the argmax if
+/// @link howard @endlink = true. Maximization is performed by either
+/// @link gridMax @endlink or @link binaryMax @endlink.
 ///
-/// @param nk length of the capital grid.
-/// @param nz length of the TFP grid.
-/// @param eta risk aversion parameter.
-/// @param beta discount factor.	       
-/// @param alpha capital share of production.
-/// @param delta depreciation rate of capital.
-/// @param maxtype maximization method - 'g' corresponds to grid search
-/// and 'b' corresponds to binary search.
-/// @param howard indicates if the current iteration of the value function
-/// will perform a maximization (false) or if it will simply compute the
-/// new value function using the concurrent policy function (true).
-/// @param K pointer to grid of capital values.
-/// @param Z pointer to grid of TFP values.
-/// @param P pointer to TFP transition matrix.
-/// @param V0 pointer to array storing current value function.
-/// @param V pointer to array of storing updated value function.
-/// @param G pointer to array of storing policy function (updated if
-/// howard = false.
+/// @param [in] param Object of class parameters.
+/// @param [in] howard Indicates if the current iteration of the value
+/// function will perform a maximization (false) or if it will simply compute
+/// the new value function using the concurrent policy function (true).
+/// @param [in] K Grid of capital values.
+/// @param [in] Z Grid of TFP values.
+/// @param [in] P TFP transition matrix.
+/// @param [in] V0 Matrix storing current value function.
+/// @param [out] V Matrix storing updated value function.
+/// @param [in,out] G Matrix storing policy function (updated if
+/// howard = false).
 ///
 /// @returns Void.
-///
-/// @author Eric M. Aldrich \n
-///         ealdrich@ucsc.edu
-///
-/// @version 1.0
-///
-/// @date 24 July 2012
-///
-/// @copyright Copyright Eric M. Aldrich 2012 \n
-///            Distributed under the Boost Software License, Version 1.0
-///            (See accompanying file LICENSE_1_0.txt or copy at \n
-///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
 __global__ void vfStep(const parameters param, const bool howard,

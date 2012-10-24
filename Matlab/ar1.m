@@ -1,3 +1,37 @@
+%=============================================================================
+%>
+%> @file ar1.m
+%>
+%> @brief File containing AR1 function for the VFI problem.
+%>
+%> @author Eric M. Aldrich \n
+%>         ealdrich@ucsc.edu
+%>
+%> @version 1.0
+%>
+%> @date 23 Oct 2012
+%>
+%> @copyright Copyright Eric M. Aldrich 2012 \n
+%>            Distributed under the Boost Software License, Version 1.0
+%>            (See accompanying file LICENSE_1_0.txt or copy at \n
+%>            http://www.boost.org/LICENSE_1_0.txt)
+%>
+%=============================================================================
+
+%=============================================================================
+%>
+%> @brief Function to compute discrete AR1 approximation values and
+%> transition matrix.
+%>
+%> @details This function that computes a discrete AR1 approximation and
+%> transition matrix using the method of Tauchen (1986).
+%>
+%> @param [in] param Object of class parameters.
+%>
+%> @retval Z Grid of AR1 values.
+%> @retval P AR1 transition matrix values.
+%>
+%=============================================================================
 function [Z, P] = ar1(param)
 
     % basic parameters

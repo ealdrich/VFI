@@ -1,3 +1,24 @@
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file parameters.cpp
+///
+/// @brief File containing parameters class method for loading VFI
+/// parameter values.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 23 Oct 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+
 #include "global.h"
 #include <stdlib.h>
 #include <vector>
@@ -5,6 +26,22 @@
 
 using namespace std;
 
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @brief Function to load VFI parameter values to parameters object.
+///
+/// @details This function is a parameters class method which loads
+/// parameter values from a text file for storage in the object. The input
+/// file must have 13 lines, each line beginning with a parameter value,
+/// followed by a comma and a character string describing the parameter. The
+/// order of the parameters must correspond to the order in the parameters
+/// class description.
+///
+/// @param [in] fileName Name of file storing parameter values.
+///
+/// @returns Void.
+///
+//////////////////////////////////////////////////////////////////////////////
 void parameters::load(const char* fileName)
 {
   int nParam = 13;

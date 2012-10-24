@@ -2,7 +2,19 @@
 ///
 /// @file main.cu
 ///
-/// @brief File containing main main function for the VFI problem.
+/// @brief File containing main function for the VFI problem.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 23 Oct 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +43,7 @@ using namespace std;
 /// value function iteration, using Thrust. Parallelization occurs at the
 /// grid of values for the state space, with each thread finding the
 /// maximum of the Bellman objective function for a pair of state values.
+/// Thrust can utilize a CUDA (GPU) or OpenMP (multi-core CPU) backend.
 ///
 /// @details See Aldrich, Eric M., Jesus Fernandez-Villaverde,
 /// A. Ronald Gallant and Juan F. Rubio-Ramirez (2011), "Tapping the
@@ -40,18 +53,6 @@ using namespace std;
 /// @see functors.hpp
 ///
 /// @returns 0 upon successful completion, 1 otherwise.
-///
-/// @author Eric M. Aldrich \n
-///         ealdrich@ucsc.edu
-///
-/// @version 1.0
-///
-/// @date 12 July 2012
-///
-/// @copyright Copyright Eric M. Aldrich 2012 \n
-///            Distributed under the Boost Software License, Version 1.0
-///            (See accompanying file LICENSE_1_0.txt or copy at \n
-///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
 int main()
@@ -94,7 +95,7 @@ int main()
 				  raw_pointer_cast(&K[0]), raw_pointer_cast(&Z[0]),
 				  raw_pointer_cast(&P[0]), raw_pointer_cast(&V0[0]),
 				  raw_pointer_cast(&V[0]), raw_pointer_cast(&G[0])));
-    thrust::transform(V.begin(), V.end(), V0.begin(), V0.begin(), abs_diff<REAL>());
+    thrust::transform(V.begin(), V.end(), V0.begin(), V0.begin(), absDiff<REAL>());
     maxIter = thrust::max_element(V0.begin(), V0.end());
     diff = *maxIter;
     V0 = V;

@@ -20,7 +20,7 @@
 *.lyx?
 
 # Derived files
-*.pdf
+#*.pdf
 
 # Image Directories
 images

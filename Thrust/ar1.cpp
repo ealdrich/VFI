@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file ar1.cpp
+///
+/// @brief File containing AR1 function for the VFI problem.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 23 Oct 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+
 #include "global.h"
 #include <math.h>
 #include <thrust/device_vector.h>
@@ -10,24 +30,11 @@
 /// @details This function that computes a discrete AR1 approximation and
 /// transition matrix using the method of Tauchen (1986).
 ///
-/// @param lambda upper and lower bounds on the AR1 grid in terms of number
-/// of standard deviations from the mean.
-/// @param Z pointer to array of AR1 grid values.
-/// @param P pointer to array of AR1 transition matrix values.
+/// @param [in] param Object of class parameters.
+/// @param [out] Z Grid of AR1 values.
+/// @param [out] P AR1 transition matrix values.
 ///
 /// @returns Void.
-///
-/// @author Eric M. Aldrich \n
-///         ealdrich@ucsc.edu
-///
-/// @version 1.0
-///
-/// @date 24 July 2012
-///
-/// @copyright Copyright Eric M. Aldrich 2012 \n
-///            Distributed under the Boost Software License, Version 1.0
-///            (See accompanying file LICENSE_1_0.txt or copy at \n
-///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
 void ar1(const parameters& param, thrust::device_vector<REAL>& Z,

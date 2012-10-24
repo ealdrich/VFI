@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @file binaryMax.cpp
+///
+/// @brief File containing binary search maximization function.
+///
+/// @author Eric M. Aldrich \n
+///         ealdrich@ucsc.edu
+///
+/// @version 1.0
+///
+/// @date 23 Oct 2012
+///
+/// @copyright Copyright Eric M. Aldrich 2012 \n
+///            Distributed under the Boost Software License, Version 1.0
+///            (See accompanying file LICENSE_1_0.txt or copy at \n
+///            http://www.boost.org/LICENSE_1_0.txt)
+///
+//////////////////////////////////////////////////////////////////////////////
+
 #include "global.h"
 #include <Eigen/Dense>
 #include <math.h>
@@ -6,38 +26,25 @@ using namespace Eigen;
 
 //////////////////////////////////////////////////////////////////////////////
 ///
-/// @brief function to compute maximum of Bellman objective via binary
+/// @brief Function to compute maximum of Bellman objective via binary search.
+///
+/// @details This function finds the maximum and argmax of the Bellman
+/// objective over a specified subgrid of capital by using a binary search
+/// algorithm. The algorithm requires concavity and cannot be used with the
+/// howard improvement method.
+///
+/// @param [in] klo Lower index of the capital grid to begin search.
+/// @param [in] nksub Number of points in the capital grid to include in
 /// search.
-///
-/// @details This function finds the maximum and argmax of utility over a
-/// specified subgrid of capital by using a binary search algorithm. The
-/// algorithm requires concavity and cannot be used with the howard
-/// improvement method. The max and argmax are stored in the value and policy
-/// functions, respectively.
-///
-/// @param klo index corresponding to the lowest value of the capital grid
-/// over which to maximize.
-/// @param nksub length of the subgrid of capital (beginning at klo) over
-/// which to maximize.
-/// @param ydepK value of output plus capital net of depreciation.
-/// @param K pointer to grid of capital values.
-/// @param Exp pointer to expected value function continuation values.
-/// @param V pointer to updated value function (output).
-/// @param G pointer to updated policy function (output).
+/// @param [in] ydepK value of output plus depreciated capital.
+/// @param [in] eta Coefficient of relative risk aversion.
+/// @param [in] beta Time discount factor.
+/// @param [in] K Grid of capital values.
+/// @param [in] Exp Expected value function continuation values.
+/// @param [out] V Updated value function.
+/// @param [out] G Updated policy function.
 ///
 /// @returns Void.
-///
-/// @author Eric M. Aldrich \n
-///         ealdrich@ucsc.edu
-///
-/// @version 1.0
-///
-/// @date 24 July 2012
-///
-/// @copyright Copyright Eric M. Aldrich 2012 \n
-///            Distributed under the Boost Software License, Version 1.0
-///            (See accompanying file LICENSE_1_0.txt or copy at \n
-///            http://www.boost.org/LICENSE_1_0.txt)
 ///
 //////////////////////////////////////////////////////////////////////////////
 void binaryMax(const int& klo, const int& nksub, const REAL& ydepK,

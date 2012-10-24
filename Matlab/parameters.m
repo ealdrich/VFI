@@ -1,3 +1,35 @@
+%=============================================================================
+%>
+%> @file parameters.m
+%>
+%> @brief File containing parameters class definition.
+%>
+%> @author Eric M. Aldrich \n
+%>         ealdrich@ucsc.edu
+%>
+%> @version 1.0
+%>
+%> @date 23 Oct 2012
+%>
+%> @copyright Copyright Eric M. Aldrich 2012 \n
+%>            Distributed under the Boost Software License, Version 1.0
+%>            (See accompanying file LICENSE_1_0.txt or copy at \n
+%>            http://www.boost.org/LICENSE_1_0.txt)
+%>
+%=============================================================================
+
+%=============================================================================
+%>
+%> @brief Object to store parameter values for VFI problem.
+%>
+%> @details This object stores parameter values for the VFI problem. This
+%> `load' method loads parameter values from a text file. The input file must
+%> have 13 lines, each line beginning with a parameter value, followed by a
+%> comma and a character string describing the parameter. The order of the
+%> parameters must correspond to the order in the parameters class
+%> description.
+%>
+%=============================================================================
 classdef parameters<handle
     properties
         eta

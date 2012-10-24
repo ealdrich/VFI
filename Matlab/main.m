@@ -1,3 +1,31 @@
+%=============================================================================
+%>
+%> @file main.m
+%>
+%> @brief File containing Matlab code to solve the VFI problem.
+%>
+%> @details This code solves a standard neoclassical growth model with value
+%> function iteration on a CPU.
+%>
+%> @details See Aldrich, Eric M., Jesus Fernandez-Villaverde,
+%> A. Ronald Gallant and Juan F. Rubio-Ramirez (2011), "Tapping the
+%> supercomputer under your desk: Solving dynamic equilibrium models with
+%> graphics processors", Journal of Economic Dynamics & Control, 35, 386-393.
+%>
+%> @author Eric M. Aldrich \n
+%>         ealdrich@ucsc.edu
+%>
+%> @version 1.0
+%>
+%> @date 23 Oct 2012
+%>
+%> @copyright Copyright Eric M. Aldrich 2012 \n
+%>            Distributed under the Boost Software License, Version 1.0
+%>            (See accompanying file LICENSE_1_0.txt or copy at \n
+%>            http://www.boost.org/LICENSE_1_0.txt)
+%>
+%=============================================================================
+
 % load parameters
 params = parameters;
 load(params, '../parameters.txt')
