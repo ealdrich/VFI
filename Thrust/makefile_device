@@ -1,4 +1,4 @@
-# Use icpc to compile .cpp files
+# Compiler for .cpp files
 CPP  = g++
 
 # Use nvcc to compile .cu files

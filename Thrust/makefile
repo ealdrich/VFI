@@ -1,4 +1,4 @@
-# Use icpc to compile .cpp files
+# Compiler for .cpp files
 CPP  = g++
 
 # Use nvcc to compile .cu files
@@ -13,7 +13,7 @@ LCUDA = /usr/local/cuda/lib64
 LFLAGS += -lcuda -lcudart -L$(LCUDA) -lgomp
 
 # Include standard optimization flags
-CPPFLAGS = -O3 -c -I$(ICUDA)
+CPPFLAGS = -O3 -c -I$(ICUDA) -Xcompiler -fopenmp -DTHRUST_DEVICE_BACKEND=THRUST_DEVICE_BACKEND_OMP
 
 # List of all the objects you need
 OBJECTS  = timer.o ar1.o kGrid.o vfInit.o parameters.o

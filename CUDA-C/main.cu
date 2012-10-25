@@ -141,9 +141,9 @@ int main()
 
   // write to file (row major)
   ofstream fileSolTime, fileValue, filePolicy;
-  fileSolTime.open("solutionTime.dat");
-  fileValue.open("valueFunc.dat");
-  filePolicy.open("policyFunc.dat");
+  fileSolTime.open("solTimeCUDA-C.dat");
+  fileValue.open("valFunCUDA-C.dat");
+  filePolicy.open("polFunCUDA-C.dat");
   fileSolTime << solTime << endl;
   fileValue << nk << endl;
   fileValue << nz << endl;

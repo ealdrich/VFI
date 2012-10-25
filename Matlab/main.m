@@ -26,6 +26,8 @@
 %>
 %=============================================================================
 
+format long;
+
 % load parameters
 params = parameters;
 load(params, '../parameters.txt')
@@ -62,6 +64,6 @@ end
 solTime = toc;
 
 % write to file
-dlmwrite('solutionTime.dat', solTime, '');
-dlmwrite('valueFunc.dat', [params.nk; params.nz; V(:)], '');
-dlmwrite('policyFunc.dat', [params.nk; params.nz; G(:)], '');
+dlmwrite('solTimeMatlab.dat', solTime, '');
+dlmwrite('valFunMatlab.dat', [params.nk; params.nz; V(:)], '');
+dlmwrite('polFunMatlab.dat', [params.nk; params.nz; G(:)], '');

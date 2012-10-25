@@ -92,9 +92,9 @@ int main()
 
   // write to file (column major)
   ofstream fileSolTime, fileValue, filePolicy;
-  fileSolTime.open("solutionTime.dat");
-  fileValue.open("valueFunc.dat");
-  filePolicy.open("policyFunc.dat");
+  fileSolTime.open("solTimeCPP.dat");
+  fileValue.open("valFunCPP.dat");
+  filePolicy.open("polFunCPP.dat");
   fileSolTime << solTime << endl;
   fileValue << nk << endl;
   fileValue << nz << endl;
