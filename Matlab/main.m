@@ -26,8 +26,6 @@
 %>
 %=============================================================================
 
-format long;
-
 % load parameters
 params = parameters;
 load(params, '../parameters.txt')
@@ -64,6 +62,6 @@ end
 solTime = toc;
 
 % write to file
-dlmwrite('solTimeMatlab.dat', solTime, '');
-dlmwrite('valFunMatlab.dat', [params.nk; params.nz; V(:)], '');
-dlmwrite('polFunMatlab.dat', [params.nk; params.nz; G(:)], '');
+dlmwrite('solTimeMatlab.dat', solTime, 'delimiter', '', 'precision', 7);
+dlmwrite('valFunMatlab.dat', [params.nk; params.nz; V(:)], 'delimiter', '', 'precision', 10);
+dlmwrite('polFunMatlab.dat', [params.nk; params.nz; G(:)], 'delimiter', '', 'precision', 10);

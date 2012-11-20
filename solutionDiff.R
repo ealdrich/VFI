@@ -56,6 +56,8 @@ VDiff = max(abs(V1 - V2));
 # Import value functions and compute difference
 G1 = scan(paste(Dir1, pDat1, sep=''), skip=2);
 G2 = scan(paste(Dir2, pDat2, sep=''), skip=2);
+if(Method1 == "Matlab") G1 = G1-1;
+if(Method2 == "Matlab") G2 = G2-1;
 GDiff = max(abs(G1 - G2));
 
 # Write out

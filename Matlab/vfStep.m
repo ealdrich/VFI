@@ -101,7 +101,7 @@ function [V,G] = vfStep(param, matlabMax, howard, K, Z, P, V0, G0)
 		      [V(i,j), G(i,j)] = binaryMax(klo, nksub, ydepK(i,j), eta, beta, K, Exp);
                     end
                 end
-            
+
             else
                 Exp = V0(G0(i,j),:)*P(j,:)';
                 V(i,j) = ((ydepK(i,j)-K(G0(i,j)))^(1-eta))/(1-eta) + beta*Exp(1);

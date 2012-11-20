@@ -43,6 +43,7 @@
 function [V, G] = gridMax(klo, nksub, ydepK, eta, beta, K, Exp)
 
   w = ((ydepK-K(klo))^(1-eta))/(1-eta) + beta*Exp(1);
+  wmax = w;
   windmax = 1;
   for(l = 2:nksub)
     w = ((ydepK-K(klo+l-1))^(1-eta))/(1-eta) + beta*Exp(l);

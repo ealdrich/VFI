@@ -60,7 +60,7 @@ function [V,G] = binaryMax(klo, nksub, ydepK, eta, beta, K, Exp)
         end
         % when the grid is reduced to three values, find the max
         if(w2 > w1)
-            w2 = ((ydepK-K(klo+kshi-1))^(1-eta))/(1-eta) + beta*Exp(kshi);
+            w1 = ((ydepK-K(klo+kshi-1))^(1-eta))/(1-eta) + beta*Exp(kshi);
             if(w2 > w1)
                 V = w2; G = klo+kslo;
             else

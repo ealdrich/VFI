@@ -65,11 +65,13 @@ function solutionDiff(Method1, Method2)
     % Import first policy function
     fileID = fopen([Dir1 pDat1]);
     G1 = textscan(fileID, '%f');
+    if strcmp(Method1, 'Matlab') G1 = G1-1; end
     fclose(fileID);
 
     % Import second policy function
     fileID = fopen([Dir2 pDat2]);
     G2 = textscan(fileID, '%f');
+    if strcmp(Method1, 'Matlab') G2 = G2-1; end
     fclose(fileID);
 
     % Compute policy function differences

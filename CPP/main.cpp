@@ -92,6 +92,8 @@ int main()
 
   // write to file (column major)
   ofstream fileSolTime, fileValue, filePolicy;
+  fileValue.precision(10);
+  filePolicy.precision(10);
   fileSolTime.open("solTimeCPP.dat");
   fileValue.open("valFunCPP.dat");
   filePolicy.open("polFunCPP.dat");

@@ -60,8 +60,8 @@
 /// @section Dependencies
 ///
 /// The Thrust and CUDA-C implementations have been successfully built and
-/// run under CUDA Toolkit 4.2 on a CentOS 6 Linux operating system. The
-/// C++ implementation utilizes the GNU g++ compiler and the Eigen
+/// run under CUDA Toolkits 4.2 and 5.0 on a CentOS 6 Linux operating system.
+/// The C++ implementation utilizes the GNU g++ compiler and the Eigen
 /// template library for linear algebra (eigen.tuxfamily.org). The
 /// makefiles in the respective directories point to headers and libraries
 /// for CUDA and Eigen - these directory paths may need to be changed

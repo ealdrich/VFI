@@ -68,8 +68,14 @@ int main()
   int nk = params.nk;
   int nz = params.nz;
 
+  // Time the GPU startup overhead
+  REAL tic = curr_second();
+  thrust::device_vector<REAL> dummy(1);
+  REAL toc = curr_second();
+  REAL startTime = toc - tic;
+
   // Allocate variables in device memory
-  REAL tic = curr_second(); // Start timer
+  tic = curr_second(); // Start the timer for solution
   thrust::device_vector<REAL> K(nk);
   thrust::device_vector<REAL> Z(nz);
   thrust::device_vector<REAL> P(nz*nz);
@@ -104,15 +110,21 @@ int main()
   }
 
   // Compute solution time
-  REAL toc = curr_second();
+  toc = curr_second();
   REAL solTime  = toc - tic;
 
   // write to file (column major)
-  ofstream fileSolTime, fileValue, filePolicy;
+  ofstream fileStartTime, fileSolTime, fileTotalTime, fileValue, filePolicy;
+  fileValue.precision(7);
+  filePolicy.precision(7);
+  fileStartTime.open("startTimeThrust.dat");
   fileSolTime.open("solTimeThrust.dat");
+  fileTotalTime.open("totalTimeThrust.dat");
   fileValue.open("valFunThrust.dat");
   filePolicy.open("polFunThrust.dat");
+  fileStartTime << startTime << endl;
   fileSolTime << solTime << endl;
+  fileTotalTime << startTime+solTime << endl;
   fileValue << nk << endl;
   fileValue << nz << endl;
   filePolicy << nk << endl;
@@ -123,7 +135,9 @@ int main()
       filePolicy << G[ix+jx*nk] << endl;
     }
   }  
+  fileStartTime.close();
   fileSolTime.close();
+  fileTotalTime.close();
   fileValue.close();
   filePolicy.close();
 

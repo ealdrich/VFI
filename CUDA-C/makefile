@@ -1,11 +1,11 @@
-# Use icpc to compile .cpp files
+# Compiler for .cpp files
 CPP  = g++
 
 # Use nvcc to compile .cu files
 NVCC = nvcc
 NVCCFLAGS = -arch sm_20 # For fermi's in keeneland
 
-# Add CUDA and GSL Paths
+# Add CUDA Paths
 ICUDA = /usr/local/cuda/include
 LCUDA = /usr/local/cuda/lib64
 

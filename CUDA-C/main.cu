@@ -50,13 +50,10 @@ using namespace std;
 int main()
 { 
 
-  // admin
+  // Admin
   int imax;
   REAL diff = 1.0;
-  cublasHandle_t handle;
-  cublasCreate(&handle);
   REAL negOne = -1.0;
-  double tic = curr_second(); // Start time
 
   // Load parameters
   parameters params;
@@ -64,10 +61,18 @@ int main()
   int nk = params.nk;
   int nz = params.nz;
 
-  // pointers to variables in device memory
+  // Time the GPU startup overhead
+  REAL tic = curr_second();
+  cublasHandle_t handle;
+  cublasCreate(&handle);
+  REAL toc = curr_second();
+  REAL startTime = toc - tic;
+
+  // Pointers to variables in device memory
   REAL *K, *Z, *P, *V0, *V, *G, *Vtemp;
 
-  // allocate variables in device memory
+  // Allocate variables in device memory
+  tic = curr_second(); // Start the timer for solution
   size_t sizeK = nk*sizeof(REAL);
   size_t sizeZ = nz*sizeof(REAL);
   size_t sizeP = nz*nz*sizeof(REAL);
@@ -81,24 +86,24 @@ int main()
   cudaMalloc((void**)&V, sizeV);
   cudaMalloc((void**)&G, sizeG);
 
-  // blocking
+  // Blocking
   const int block_size = 4; ///< Block size for CUDA kernel.
   dim3 dimBlockV(block_size, nz);
   dim3 dimGridV(nk/block_size,1);
  
-  // compute TFP grid, capital grid and initial VF
+  // Compute TFP grid, capital grid and initial VF
   REAL hK[nk], hZ[nz], hP[nz*nz], hV0[nk*nz];
   ar1(params, hZ, hP);
   kGrid(params, hZ, hK);
   vfInit(params, hZ, hV0);
 
-  // copy capital grid, TFP grid and transition matrix to GPU memory
+  // Copy capital grid, TFP grid and transition matrix to GPU memory
   cudaMemcpy(K, hK, sizeK, cudaMemcpyHostToDevice);
   cudaMemcpy(Z, hZ, sizeZ, cudaMemcpyHostToDevice);
   cudaMemcpy(P, hP, sizeP, cudaMemcpyHostToDevice);
   cudaMemcpy(V0, hV0, sizeV, cudaMemcpyHostToDevice);
 
-  // iterate on the value function
+  // Iterate on the value function
   int count = 0;
   bool how = false;
   while(fabs(diff) > params.tol){
@@ -120,16 +125,16 @@ int main()
   V = V0;
   
   // Compute solution time
-  REAL toc = curr_second();
+  toc = curr_second();
   REAL solTime  = toc - tic;
 
-  // copy value and policy functions to host memory
+  // Copy value and policy functions to host memory
   REAL* hV = new REAL[nk*nz];
   REAL* hG = new REAL[nk*nz];
   cudaMemcpy(hV, V, sizeV, cudaMemcpyDeviceToHost);
   cudaMemcpy(hG, G, sizeG, cudaMemcpyDeviceToHost);
 
-  // free variables in device memory
+  // Free variables in device memory
   cudaFree(K);
   cudaFree(Z);
   cudaFree(P);
@@ -139,12 +144,18 @@ int main()
   cudaFree(G);
   cublasDestroy(handle);
 
-  // write to file (row major)
-  ofstream fileSolTime, fileValue, filePolicy;
+  // Write to file (row major)
+  ofstream fileStartTime, fileSolTime, fileTotalTime, fileValue, filePolicy;
+  fileValue.precision(7);
+  filePolicy.precision(7);
+  fileStartTime.open("startTimeCUDA-C.dat");
   fileSolTime.open("solTimeCUDA-C.dat");
+  fileTotalTime.open("totalTimeCUDA-C.dat");
   fileValue.open("valFunCUDA-C.dat");
   filePolicy.open("polFunCUDA-C.dat");
+  fileStartTime << startTime << endl;
   fileSolTime << solTime << endl;
+  fileSolTime << startTime+solTime << endl;
   fileValue << nk << endl;
   fileValue << nz << endl;
   filePolicy << nk << endl;
@@ -155,7 +166,9 @@ int main()
       filePolicy << hG[ix*nz+jx] << endl;
     }
   }  
+  fileStartTime.close();
   fileSolTime.close();
+  fileTotalTime.close();
   fileValue.close();
   filePolicy.close();
 
