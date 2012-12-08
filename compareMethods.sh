@@ -16,7 +16,7 @@ if [ $1 = Matlab ]; then
 else
     if [ $1 = ThrustGPU ]; then
 	cd $HomeDir/Thrust
-	cp makefile_device makefile
+	cp makefile_gpu makefile
 	echo
 	echo =================================================
 	echo Running Baseline $1 Code
@@ -32,7 +32,7 @@ else
     else
 	if [ $1 = ThrustOMP ]; then
 	    cd $HomeDir/Thrust
-	    cp makefile_host makefile
+	    cp makefile_omp makefile
 	    echo
 	    echo =================================================
 	    echo Running Baseline $1 Code
@@ -73,7 +73,7 @@ do
     else
 	if [ $method = ThrustGPU ]; then
 	    cd $HomeDir/Thrust
-	    cp makefile_device makefile
+	    cp makefile_gpu makefile
 	    echo
 	    echo =================================================
 	    echo Running $method Comparison
@@ -89,7 +89,7 @@ do
 	else
 	    if [ $method = ThrustOMP ]; then
 		cd $HomeDir/Thrust
-		cp makefile_host makefile
+		cp makefile_omp makefile
 		echo
 		echo =================================================
 		echo Running $method Comparison

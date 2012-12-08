@@ -31,8 +31,8 @@
 /// The Matlab code can be run via `main.m' either interactively or in batch.
 ///
 /// The `Thrust' directory contains two makefiles, one corresponding to a
-/// GPU implementation (makefile_device) and one corresponding to an OpenMP
-/// CPU implementation (makefile_host). When using the OpenMP implementation
+/// GPU implementation (makefile_gpu) and one corresponding to an OpenMP
+/// CPU implementation (makefile_omp). When using the OpenMP implementation
 /// it is important to set the environment variable `OMP_NUM_THREADS=N',
 /// where `N' is the number of CPU cores available on the system.
 ///
