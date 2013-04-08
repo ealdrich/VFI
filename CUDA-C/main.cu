@@ -105,10 +105,8 @@ int main()
 
   // Iterate on the value function
   int count = 0;
-  bool how = false;
   while(fabs(diff) > params.tol){
-    if(count < 3 | count % params.howard == 0) how = false; else how = true;
-    vfStep<<<dimGridV,dimBlockV>>>(params,how,K,Z,P,V0,V,G);
+    vfStep<<<dimGridV,dimBlockV>>>(params,K,Z,P,V0,V,G);
     if(typeid(realtype) == typeid(singletype)){
       cublasSaxpy(handle, nk*nz, (float*)&negOne, (float*)V, 1, (float*)V0, 1);
       cublasIsamax(handle, nk*nz, (float*)V0, 1, &imax);

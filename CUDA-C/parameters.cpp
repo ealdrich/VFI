@@ -64,6 +64,4 @@ void parameters::load(const char* fileName)
   nk = atoi(params[8].c_str());
   nz = atoi(params[9].c_str());
   tol = atof(params[10].c_str());
-  maxtype = params[11][0];
-  howard = atoi(params[12].c_str());
 }

@@ -93,11 +93,9 @@ int main()
 
   // iterate on the value function
   int count = 0;
-  bool how = false;
   while(fabs(diff) > params.tol){
-    if(count < 3 | count % params.howard == 0) how = false; else how = true;
     thrust::for_each(seq_vec.begin(), seq_vec.end(),
-		     vfStep<REAL>(params, how,
+		     vfStep<REAL>(params,
 				  raw_pointer_cast(&K[0]), raw_pointer_cast(&Z[0]),
 				  raw_pointer_cast(&P[0]), raw_pointer_cast(&V0[0]),
 				  raw_pointer_cast(&V[0]), raw_pointer_cast(&G[0])));

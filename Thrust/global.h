@@ -45,8 +45,6 @@ class parameters{
   int nk; ///< Number of values in capital grid.
   int nz; ///< Number of values in TFP grid.
   REAL tol; ///< Tolerance for convergence.
-  char maxtype; ///< @brief Maximization method - choices are `g' (grid) and `b' (binary search).
-  int howard; ///< @brief Number of howard steps to perform between maximizations - set howard = 1 if max = `b'.
   void load(const char*);
 };
 

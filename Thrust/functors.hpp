@@ -35,11 +35,9 @@ using namespace std;
 /// @brief Functor to update the value function.
 ///
 /// @details This functor performs one iteration of the value function
-/// iteration algorithm, using V0 as the current value function and either
-/// maximizing the LHS of the Bellman if @link howard @endlink = false or
-/// using the concurrent policy function as the argmax if
-/// @link howard @endlink = true. Maximization is performed by either
-/// @link gridMax @endlink or @link binaryMax @endlink.
+/// iteration algorithm, using V0 as the current value function, maximizing
+/// the LHS of the Bellman. Maximization is performed by @link binaryMax
+/// @endlink.
 ///
 //////////////////////////////////////////////////////////////////////////////
 template <typename T>
@@ -47,7 +45,6 @@ struct vfStep
 {
   // Attributes
   const parameters params; ///< Object containing parameters.
-  const bool howard; ///< Boolean for howard step.
   const T* K; ///< Pointer to capital grid.
   const T* Z; ///< Pointer to AR1 (TFP) grid.
   const T* P; ///< Pointer to transition matrix.
@@ -56,8 +53,8 @@ struct vfStep
   T* G; ///< Pointer to current iteration of the capital policy function.
 
   /// Constructor
-  vfStep(parameters _params, bool _howard, T* _K, T* _Z, T* _P, T* _V0, T* _V, T* _G)
-    : params(_params), howard(_howard), K(_K), Z(_Z), P(_P), V0(_V0), V(_V), G(_G) {}
+  vfStep(parameters _params, T* _K, T* _Z, T* _P, T* _V0, T* _V, T* _G)
+    : params(_params), K(_K), Z(_Z), P(_P), V0(_V0), V(_V), G(_G) {}
 
   /// Kernel to update the value function.
   /// @param hx index of V0 (stored as a flat array).
@@ -73,7 +70,6 @@ struct vfStep
     const REAL beta = params.beta;
     const REAL alpha = params.alpha;
     const REAL delta = params.delta;
-    const char maxtype = params.maxtype;
     
     // Compute the row and column IDs
     int ix = hx%nk;
@@ -82,31 +78,16 @@ struct vfStep
     // Output and depreciated capital
     const T ydepK = Z[jx]*pow(K[ix],alpha) + (1-delta)*K[ix];
 
-    // maximize on non-howard steps
-    if(howard == false){
-      
-      // impose constraints on grid for future capital
-      const int klo = 0;
-      int khi = binaryVal(ydepK, nk, K); // nonnegativity of C
-      if(K[khi] > ydepK) khi -= 1;
-      const int nksub = khi-klo+1;
+    // impose constraints on grid for future capital
+    const int klo = 0;
+    int khi = binaryVal(ydepK, nk, K); // nonnegativity of C
+    if(K[khi] > ydepK) khi -= 1;
+    const int nksub = khi-klo+1;
 
-      // maximization either via grid (g), or binary search (b)
-      // if binary, turn off policy iteration (to preserve concavity)
-      if(maxtype == 'g'){
-	gridMax(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
-		 V0+klo, V+ix+jx*nk, G+ix+jx*nk);
-      } else if(maxtype == 'b'){
-	binaryMax(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
-	   V0+klo, V+ix+jx*nk, G+ix+jx*nk);
-      }
+    // maximization
+    binaryMax(klo, nksub, nk, nz, ydepK, eta, beta, K, P+jx,
+	      V0+klo, V+ix+jx*nk, G+ix+jx*nk);
 
-      // iterate on the policy function on non-howard steps
-    } else {
-      T Exp = 0.0;
-      for(int mx = 0 ; mx < nz ; ++mx) Exp += P[jx+mx*nz]*V0[(int)G[ix+jx*nk]+mx*nk];
-      V[ix+jx*nk] = pow(ydepK-K[(int)G[ix+jx*nk]],1-eta)/(1-eta) + beta*Exp;
-    }
   }
 };
 
@@ -217,8 +198,7 @@ void gridMax(const int klo, const int nksub, const int nk,
 ///
 /// @details This function finds the maximum and argmax of the Bellman
 /// objective over a specified subgrid of capital by using a binary search
-/// algorithm. The algorithm requires concavity and cannot be used with the
-/// howard improvement method.
+/// algorithm. The algorithm requires concavity.
 ///
 /// @param [in] klo Lower index of the capital grid to begin search.
 /// @param [in] nksub Number of points in the capital grid to include in

@@ -52,8 +52,6 @@ class parameters{
   int nk; ///< Number of values in capital grid.
   int nz; ///< Number of values in TFP grid.
   REAL tol; ///< Tolerance for convergence.
-  char maxtype; ///< @brief Maximization method - choices are `g' (grid) and `b' (binary search).
-  int howard; ///< @brief Number of howard steps to perform between maximizations - set howard = 1 if max = `b'.
   void load(const char*);
 };
 
@@ -62,13 +60,9 @@ double curr_second (void);
 void ar1(const parameters& param, VectorXR& Z, MatrixXR& P);
 void kGrid(const parameters& param, const VectorXR& Z, VectorXR& K);
 void vfInit(const parameters& param, const VectorXR& Z, MatrixXR& V);
-void vfStep(const parameters& param, const bool& howard, const VectorXR& K,
-	    const VectorXR& Z, const MatrixXR& P, const MatrixXR& V0,
-	    MatrixXR& V, MatrixXi& G);
+void vfStep(const parameters& param, const VectorXR& K, const VectorXR& Z,
+	    const MatrixXR& P, const MatrixXR& V0, MatrixXR& V, MatrixXi& G);
 int binaryVal(const REAL& x, const VectorXR& X);
-void gridMax(const int& klo, const int& nksub, const REAL& ydepK,
-	     const REAL eta, const REAL beta, const VectorXR& K,
-	     const VectorXR& Exp, REAL& V, int& G);
 void binaryMax(const int& klo, const int& nksub, const REAL& ydepK,
 	       const REAL eta, const REAL beta, const VectorXR& K,
 	       const VectorXR& Exp, REAL& V, int& G);

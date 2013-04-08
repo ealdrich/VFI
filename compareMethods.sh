@@ -1,6 +1,6 @@
 #!/bin/sh
 
-HomeDir=~/VFI
+HomeDir=~/VFI-Revised
 #HomeDir=~/Dropbox/Academics/Research/Duke/GPU/CUDA/Code/VFI/vfi
 
 # Run baseline code

@@ -43,8 +43,6 @@ classdef parameters<handle
         nk
         nz
         tol
-        maxtype
-        howard
     end
     methods
         function load(obj, fileName)
@@ -61,8 +59,6 @@ classdef parameters<handle
             obj.nk = str2num(char(params(17)));
             obj.nz = str2num(char(params(19)));
             obj.tol = str2num(char(params(21)));
-            obj.maxtype = char(params(23));
-            obj.howard = str2num(char(params(25)));
         end
     end
 end

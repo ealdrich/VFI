@@ -24,8 +24,7 @@
 %>
 %> @details This function finds the maximum and argmax of the Bellman
 %> objective over a specified subgrid of capital by using a binary search
-%> algorithm. The algorithm requires concavity and cannot be used with the
-%> howard improvement method.
+%> algorithm. The algorithm requires concavity.
 %>
 %> @param [in] klo Lower index of the capital grid to begin search.
 %> @param [in] nksub Number of points in the capital grid to include in

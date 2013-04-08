@@ -43,15 +43,9 @@ V0 = vfInit(params, Z);
 
 % iterate
 count = 0;
-how = false;
 G0 = ones(params.nk,params.nz);
 while(abs(diff) > params.tol)
-    if(count <= 3 | mod(count, params.howard) == 0)
-        how = false;
-    else
-        how = true;
-    end
-    [V, G] = vfStep(params, matlabMax, how, K, Z, P, V0,G0);
+    [V, G] = vfStep(params, matlabMax, K, Z, P, V0,G0);
     diff = max(max(abs(V-V0)));
     V0 = V;
     G0 = G;

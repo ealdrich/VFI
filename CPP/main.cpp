@@ -76,10 +76,8 @@ int main()
 
   // iterate
   int count = 0;
-  bool how = false;
   while(fabs(diff) > params.tol){
-    if(count < 3 | count % params.howard == 0) how = false; else how = true;
-    vfStep(params, how, K, Z, P, V0, V, G);
+    vfStep(params, K, Z, P, V0, V, G);
     diff = (V-V0).array().abs().maxCoeff();
     V0 = V;
     ++count;
