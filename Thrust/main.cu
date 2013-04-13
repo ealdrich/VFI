@@ -69,10 +69,10 @@ int main()
   int nz = params.nz;
 
   // Time the GPU startup overhead
-  REAL tic = curr_second();
+  double tic = curr_second();
   thrust::device_vector<REAL> dummy(1);
-  REAL toc = curr_second();
-  REAL startTime = toc - tic;
+  double toc = curr_second();
+  double startTime = toc - tic;
 
   // Allocate variables in device memory
   tic = curr_second(); // Start the timer for solution
@@ -109,7 +109,7 @@ int main()
 
   // Compute solution time
   toc = curr_second();
-  REAL solTime  = toc - tic;
+  double solTime  = toc - tic;
 
   // write to file (column major)
   ofstream fileStartTime, fileSolTime, fileTotalTime, fileValue, filePolicy;

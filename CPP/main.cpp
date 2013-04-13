@@ -85,8 +85,8 @@ int main()
   }
 
   // Compute solution time
-  REAL toc = curr_second();
-  REAL solTime  = toc - tic;
+  double toc = curr_second();
+  double solTime  = toc - tic;
 
   // write to file (column major)
   ofstream fileSolTime, fileValue, filePolicy;

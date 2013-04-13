@@ -62,11 +62,11 @@ int main()
   int nz = params.nz;
 
   // Time the GPU startup overhead
-  REAL tic = curr_second();
+  double tic = curr_second();
   cublasHandle_t handle;
   cublasCreate(&handle);
-  REAL toc = curr_second();
-  REAL startTime = toc - tic;
+  double toc = curr_second();
+  double startTime = toc - tic;
 
   // Pointers to variables in device memory
   REAL *K, *Z, *P, *V0, *V, *G, *Vtemp;
@@ -124,7 +124,7 @@ int main()
   
   // Compute solution time
   toc = curr_second();
-  REAL solTime  = toc - tic;
+  double solTime  = toc - tic;
 
   // Copy value and policy functions to host memory
   REAL* hV = new REAL[nk*nz];
